@@ -116,7 +116,11 @@ class TokenController extends Controller
         // verify access
         $uri     = (string) config('spectre.uri');
         $token   = (string) config('spectre.access_token');
-        $request = new SystemInformationRequest($uri, $token, (string) config('spectre.trusted_cert'));
+        $request = new SystemInformationRequest($uri, $token);
+
+        $request->setVerify(config('spectre.configuration.verify'));
+        $request->setTimeOut(config('spectre.configuration.timeout'));
+
         try {
             $result = $request->get();
         } catch (ApiHttpException $e) {
@@ -148,6 +152,10 @@ class TokenController extends Controller
         $appId    = config('spectre.spectre_app_id');
         $secret   = config('spectre.spectre_secret');
         $request  = new ListCustomersRequest($uri, $appId, $secret);
+
+        $request->setVerify(config('spectre.configuration.verify'));
+        $request->setTimeOut(config('spectre.configuration.timeout'));
+
         $response = $request->get();
         if ($response instanceof ErrorResponse) {
             return sprintf('%s: %s', $response->class, $response->message);

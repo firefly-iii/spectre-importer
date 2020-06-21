@@ -78,7 +78,10 @@ class SendTransactions
      */
     private function sendTransaction(string $uri, string $token, int $index, array $transaction): array
     {
-        $request = new PostTransactionRequest($uri, $token, (string) config('spectre.trusted_cert'));
+        $request = new PostTransactionRequest($uri, $token);
+
+        $request->setVerify(config('spectre.configuration.verify'));
+        $request->setTimeOut(config('spectre.configuration.timeout'));
         $request->setBody($transaction);
         try {
             /** @var PostTransactionResponse $response */

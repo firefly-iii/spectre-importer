@@ -140,7 +140,11 @@ class MappingController extends Controller
     {
         $token   = (string) config('spectre.access_token');
         $uri     = (string) config('spectre.uri');
-        $request = new GetAccountsRequest($uri, $token, (string) config('spectre.trusted_cert'));
+        $request = new GetAccountsRequest($uri, $token);
+
+        $request->setVerify(config('spectre.configuration.verify'));
+        $request->setTimeOut(config('spectre.configuration.timeout'));
+
         /** @var GetAccountsResponse $result */
         $result = $request->get();
         $return = [];
@@ -170,7 +174,11 @@ class MappingController extends Controller
     {
         $token   = (string) config('spectre.access_token');
         $uri     = (string) config('spectre.uri');
-        $request = new GetCategoriesRequest($uri, $token, (string) config('spectre.trusted_cert'));
+        $request = new GetCategoriesRequest($uri, $token);
+
+        $request->setVerify(config('spectre.configuration.verify'));
+        $request->setTimeOut(config('spectre.configuration.timeout'));
+
         /** @var GetCategoriesResponse $result */
         $result = $request->get();
         $return = [];

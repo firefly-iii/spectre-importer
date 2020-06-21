@@ -70,7 +70,11 @@ class ConfigurationController extends Controller
         // get list of asset accounts in Firefly III
         $uri         = (string) config('spectre.uri');
         $token       = (string) config('spectre.access_token');
-        $accountList = new GetAccountsRequest($uri, $token, (string) config('spectre.trusted_cert'));
+        $accountList = new GetAccountsRequest($uri, $token);
+
+        $accountList->setVerify(config('spectre.configuration.verify'));
+        $accountList->setTimeOut(config('spectre.configuration.timeout'));
+
         $accountList->setType(GetAccountsRequest::ASSET);
         $ff3Accounts = $accountList->get();
 
