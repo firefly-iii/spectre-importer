@@ -71,7 +71,7 @@ class GenerateTransactions
         // send account list request to Firefly III.
         $token   = (string) config('spectre.access_token');
         $uri     = (string) config('spectre.uri');
-        $request = new GetAccountsRequest($uri, $token);
+        $request = new GetAccountsRequest($uri, $token, (string) config('spectre.trusted_cert'));
         /** @var GetAccountsResponse $result */
         $result = $request->get();
         $return = [];
@@ -215,7 +215,7 @@ class GenerateTransactions
         $uri   = (string) config('spectre.uri');
         $token = (string) config('spectre.access_token');
         app('log')->debug(sprintf('Going to download account #%d', $accountId));
-        $request = new GetAccountRequest($uri, $token);
+        $request = new GetAccountRequest($uri, $token, (string) config('spectre.trusted_cert'));
         $request->setId($accountId);
         /** @var GetAccountResponse $result */
         $result = $request->get();

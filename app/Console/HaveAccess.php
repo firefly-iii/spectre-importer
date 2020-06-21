@@ -39,7 +39,7 @@ trait HaveAccess
     {
         $uri     = (string) config('spectre.uri');
         $token   = (string) config('spectre.access_token');
-        $request = new SystemInformationRequest($uri, $token);
+        $request = new SystemInformationRequest($uri, $token, (string) config('spectre.trusted_cert'));
         try {
             $request->get();
         } catch (ApiHttpException $e) {

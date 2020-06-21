@@ -193,7 +193,7 @@ abstract class Request
         }
         if (null !== $res && 200 !== $res->getStatusCode()) {
             // return body, class must handle this
-            Log::error(sprintf('Status code is %d: %s', $res->getStatusCode(), $e->getMessage()));
+            Log::error(sprintf('Status code is %d', $res->getStatusCode()));
 
             $body = (string) $res->getBody();
         }
@@ -242,7 +242,7 @@ abstract class Request
 
         Log::debug('Final headers for spectre signed POST request:', $headers);
         try {
-            $client = new Client;
+            $client = $this->getClient();
             $res    = $client->request('POST', $fullUri, ['headers' => $headers, 'body' => $body]);
         } catch (GuzzleException|Exception $e) {
             throw new ImportException(sprintf('Guzzle Exception: %s', $e->getMessage()));
@@ -297,7 +297,7 @@ abstract class Request
 
         Log::debug('Final headers for spectre UNsigned POST request:', $headers);
         try {
-            $client = new Client;
+            $client = $this->getClient();
             $res    = $client->request('POST', $fullUri, $opts);
         } catch (GuzzleException|Exception $e) {
             Log::error($e->getMessage());
