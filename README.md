@@ -37,23 +37,21 @@
 - [Known import challenges](#known-import-challenges)
 - [Other stuff](#other-stuff)
 	- [Contribute](#contribute)
-	- [Support the development of Firefly III](#support-the-development-of-firefly-iii)
+	- [Support the development of Firefly III and the Spectre API import tool](#support-the-development-of-firefly-iii-and-the-spectre-api-import-tool)
 	- [Contact](#contact)
 
 <!-- /MarkdownTOC -->
 
 ## About the Firefly III Salt Edge / Spectre importer
-This is a tool to import from Salt Edge / Spectre files into [Firefly III](https://github.com/firefly-iii/firefly-iii). It works by using a personal access token to access your
-Firefly III installation's API. It will then create transactions based upon the connections you have defined in your Salt Edge / Spectre account.
- 
-Salt Edge / Spectre isn't actually meant for this use case: it's a business service designed for people who build financial services like Mint.com or YNAB
-. Or maybe, you're building an iPhone app? Then Salt Edge is something for you.
+This is a tool to import from Salt Edge / Spectre files into [Firefly III](https://github.com/firefly-iii/firefly-iii). It works by using a personal access token to access your Firefly III installation's API. It will then create transactions downloaded from your bank through the Spectre API.
 
-For us mortals however, we can use Salt Edge / Spectre's free tier to connect to our bank since it's inside of the limit that Salt Edge puts on free accounts.
+The [Spectre API](https://www.saltedge.com/products/spectre) is a product by fintech company [Salt Edge](https://www.saltedge.com/). It is one of the few API's that I know of with a (semi) free tier that can connect to a lot of banks. Technically speaking, the Spectre API isn't actually meant for this use case: it's a business service designed for people who build financial services like Mint.com or YNAB. Or maybe, you're building an iPhone app? Then Salt Edge is something for you.
+
+For us mortals however, we can use Spectre's free tier to connect to our bank since it's inside of the limit that Salt Edge puts on free accounts. The last I heard though, Spectre has a time limit of **90 days**.
 
 ### Purpose
 
-Use this tool to (automatically) import from your bank into Firefly III using Salt Edge. If you're a bit of a developer, feel free to use this code to generate
+Use this tool to (automatically) import from your bank into Firefly III using the Spectre API. If you're a bit of a developer, feel free to use this code to generate
  your own import tool.
 
 ### Features
@@ -62,7 +60,7 @@ Use this tool to (automatically) import from your bank into Firefly III using Sa
 
 ### Who's it for?
 
-Anybody who uses Firefly III and wants to automatically import from Salt Edge.
+Anybody who uses Firefly III and wants to automatically import from their bank using the Spectre API.
 
 ## Getting Started
 
@@ -78,10 +76,10 @@ The [full usage instructions](https://firefly-iii.gitbook.io/firefly-iii-spectre
 ### Using the web interface
 
 1. [Set up and configure your Personal Access Token and Firefly III URL](https://firefly-iii.gitbook.io/firefly-iii-spectre-importer/installing-and-running/configure).
-2. [Set up the necessary keys for Salt Edge / Spectre](#).
-3. Connect to your bank, select a connection, etc.
-5. [Map values in the spectre file to existing values in your database](https://firefly-iii.gitbook.io/firefly-iii-spectre-importer/importing-data/map).
-6. [Enjoy the result in Firefly III](https://github.com/firefly-iii/firefly-iii).
+2. [Create a new connection to your bank or select an existing connection](https://firefly-iii.gitbook.io/firefly-iii-spectre-importer/importing-data/select_connection).
+3. [Configure the import parameters](https://firefly-iii.gitbook.io/firefly-iii-spectre-importer/importing-data/configure).
+4. [Map values in the spectre file to existing values in your database](https://firefly-iii.gitbook.io/firefly-iii-spectre-importer/importing-data/map).
+5. [Enjoy the result in Firefly III](https://github.com/firefly-iii/firefly-iii).
 
 ### Using the auto-import
 
@@ -106,7 +104,7 @@ Of course, there are some [contributing guidelines](https://github.com/firefly-i
 
 For all other contributions, see below.
 
-### Support the development of Firefly III
+### Support the development of Firefly III and the Spectre API import tool
 
 If you like this tool and if it helps you save lots of money, why not send me a dime for every dollar saved!
 
@@ -119,12 +117,12 @@ This work [is licensed](https://github.com/firefly-iii/spectre-importer/blob/mas
 You can contact me at [james@firefly-iii.org](mailto:james@firefly-iii.org), you may open an issue or contact me through the various social media pages there are: [reddit](https://www.reddit.com/r/FireflyIII/) and [Twitter](https://twitter.com/Firefly_III).
 
 [![Scrutinizer][scrutinizer-shield]][scrutinizer-uri]
-[![Requires PHP7.3][php-shield]][php-uri]
+[![Requires PHP7.4][php-shield]][php-uri]
 [![Quality Gate Status](gate-shield)](gate-uri)
 
 [scrutinizer-shield]: https://img.shields.io/scrutinizer/g/firefly-iii/spectre-importer.svg?style=flat-square
 [scrutinizer-uri]: https://scrutinizer-ci.com/g/firefly-iii/spectre-importer/
-[php-shield]: https://img.shields.io/badge/php-7.3-red.svg?style=flat-square
+[php-shield]: https://img.shields.io/badge/php-7.4-red.svg?style=flat-square
 [php-uri]: https://secure.php.net/downloads.php
 [packagist-shield]: https://img.shields.io/packagist/v/firefly-iii/spectre-importer.svg?style=flat-square
 [packagist-uri]: https://packagist.org/packages/firefly-iii/spectre-importer
