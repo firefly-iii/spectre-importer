@@ -58,12 +58,22 @@ abstract class Request
     /** @var string */
     private $secret;
 
+    private float $timeOut = 3.14;
+
     /**
      * @return string
      */
     public function getAppId(): string
     {
         return $this->appId;
+    }
+
+    /**
+     * @param float $timeOut
+     */
+    public function setTimeOut(float $timeOut): void
+    {
+        $this->timeOut = $timeOut;
     }
 
     /**
@@ -345,7 +355,11 @@ abstract class Request
     {
         // config here
 
-        return new Client;
+        return new Client(
+            [
+                'connect_timeout' => $this->timeOut,
+            ]
+        );
     }
 
     /**

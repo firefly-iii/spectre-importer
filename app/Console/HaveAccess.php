@@ -41,8 +41,8 @@ trait HaveAccess
         $token   = (string) config('spectre.access_token');
         $request = new SystemInformationRequest($uri, $token);
 
-        $request->setVerify(config('spectre.configuration.verify'));
-        $request->setTimeOut(config('spectre.configuration.timeout'));
+        $request->setVerify(config('spectre.connection.verify'));
+        $request->setTimeOut(config('spectre.connection.timeout'));
 
         try {
             $request->get();

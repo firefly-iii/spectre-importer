@@ -72,8 +72,8 @@ class ConfigurationController extends Controller
         $token       = (string) config('spectre.access_token');
         $accountList = new GetAccountsRequest($uri, $token);
 
-        $accountList->setVerify(config('spectre.configuration.verify'));
-        $accountList->setTimeOut(config('spectre.configuration.timeout'));
+        $accountList->setVerify(config('spectre.connection.verify'));
+        $accountList->setTimeOut(config('spectre.connection.timeout'));
 
         $accountList->setType(GetAccountsRequest::ASSET);
         $ff3Accounts = $accountList->get();

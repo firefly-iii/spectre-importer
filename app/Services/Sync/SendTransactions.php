@@ -80,8 +80,8 @@ class SendTransactions
     {
         $request = new PostTransactionRequest($uri, $token);
 
-        $request->setVerify(config('spectre.configuration.verify'));
-        $request->setTimeOut(config('spectre.configuration.timeout'));
+        $request->setVerify(config('spectre.connection.verify'));
+        $request->setTimeOut(config('spectre.connection.timeout'));
         $request->setBody($transaction);
         try {
             /** @var PostTransactionResponse $response */

@@ -142,8 +142,8 @@ class MappingController extends Controller
         $uri     = (string) config('spectre.uri');
         $request = new GetAccountsRequest($uri, $token);
 
-        $request->setVerify(config('spectre.configuration.verify'));
-        $request->setTimeOut(config('spectre.configuration.timeout'));
+        $request->setVerify(config('spectre.connection.verify'));
+        $request->setTimeOut(config('spectre.connection.timeout'));
 
         /** @var GetAccountsResponse $result */
         $result = $request->get();
@@ -176,8 +176,8 @@ class MappingController extends Controller
         $uri     = (string) config('spectre.uri');
         $request = new GetCategoriesRequest($uri, $token);
 
-        $request->setVerify(config('spectre.configuration.verify'));
-        $request->setTimeOut(config('spectre.configuration.timeout'));
+        $request->setVerify(config('spectre.connection.verify'));
+        $request->setTimeOut(config('spectre.connection.timeout'));
 
         /** @var GetCategoriesResponse $result */
         $result = $request->get();

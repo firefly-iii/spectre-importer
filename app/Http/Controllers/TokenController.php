@@ -118,8 +118,8 @@ class TokenController extends Controller
         $token   = (string) config('spectre.access_token');
         $request = new SystemInformationRequest($uri, $token);
 
-        $request->setVerify(config('spectre.configuration.verify'));
-        $request->setTimeOut(config('spectre.configuration.timeout'));
+        $request->setVerify(config('spectre.connection.verify'));
+        $request->setTimeOut(config('spectre.connection.timeout'));
 
         try {
             $result = $request->get();
@@ -153,8 +153,7 @@ class TokenController extends Controller
         $secret   = config('spectre.spectre_secret');
         $request  = new ListCustomersRequest($uri, $appId, $secret);
 
-        $request->setVerify(config('spectre.configuration.verify'));
-        $request->setTimeOut(config('spectre.configuration.timeout'));
+        $request->setTimeOut(config('spectre.connection.timeout'));
 
         $response = $request->get();
         if ($response instanceof ErrorResponse) {

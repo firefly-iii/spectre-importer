@@ -20,8 +20,8 @@
                     <p>
                         Spectre creates connections; a representation of the connection to your financial institution.
                         Select below which one the importer must use, or opt to create a new connection if no connections are visible.
-                        Please read <!-- TODO -->
-                        <a href="https://firefly-iii.gitbook.io/firefly-iii-spectre-importer"
+                        Please read
+                        <a href="https://firefly-iii.gitbook.io/firefly-iii-spectre-importer/importing-data/select_connection"
                            target="_blank">the documentation for this page</a> if you want to know more.
                     </p>
                 </div>
@@ -64,7 +64,7 @@
                         {% endfor %}
                         <tr>
                             <td>
-                                <input id="new_login" type="radio" name="spectre_connection_id" value="00" {% if list|length == 0 %}checked{% endif %}>
+                                <input id="new_login" type="radio" name="spectre_connection_id" value="00" checked>
                             </td>
                             <td colspan="3">
                                 <label for="new_login"><em>
