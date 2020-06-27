@@ -40,6 +40,10 @@ trait HaveAccess
         $uri     = (string) config('spectre.uri');
         $token   = (string) config('spectre.access_token');
         $request = new SystemInformationRequest($uri, $token);
+
+        $request->setVerify(config('spectre.connection.verify'));
+        $request->setTimeOut(config('spectre.connection.timeout'));
+
         try {
             $request->get();
         } catch (ApiHttpException $e) {

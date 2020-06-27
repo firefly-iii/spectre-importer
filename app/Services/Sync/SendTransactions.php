@@ -79,6 +79,9 @@ class SendTransactions
     private function sendTransaction(string $uri, string $token, int $index, array $transaction): array
     {
         $request = new PostTransactionRequest($uri, $token);
+
+        $request->setVerify(config('spectre.connection.verify'));
+        $request->setTimeOut(config('spectre.connection.timeout'));
         $request->setBody($transaction);
         try {
             /** @var PostTransactionResponse $response */
