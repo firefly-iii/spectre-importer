@@ -54,8 +54,7 @@ class Configuration
 {
     /** @var int */
     public const VERSION = 1;
-    /** @var bool */
-    private $addImportTag;
+    private bool $addImportTag;
 
     /** @var bool When set to true, the importer will ignore existing duplicate transactions found in Firefly III. */
     private $ignoreDuplicateTransactions;
