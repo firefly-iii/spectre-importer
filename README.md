@@ -100,7 +100,7 @@ Most people run into the same problems when importing data into Firefly III. Rea
 
 Your help is always welcome! Feel free to open issues, ask questions, talk about it and discuss this tool. You can also join [reddit](https://www.reddit.com/r/FireflyIII/) or follow me on [Twitter](https://twitter.com/Firefly_III).
 
-Of course, there are some [contributing guidelines](https://github.com/firefly-iii/spectre-importer/blob/master/.github/contributing.md) and a [code of conduct](https://github.com/firefly-iii/spectre-importer/blob/master/.github/code_of_conduct.md), which I invite you to check out.
+Of course, there are some [contributing guidelines](https://github.com/firefly-iii/spectre-importer/blob/main/.github/contributing.md) and a [code of conduct](https://github.com/firefly-iii/spectre-importer/blob/main/.github/code_of_conduct.md), which I invite you to check out.
 
 For all other contributions, see below.
 
