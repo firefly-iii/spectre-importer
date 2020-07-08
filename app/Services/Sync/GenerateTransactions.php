@@ -60,6 +60,7 @@ class GenerateTransactions
     {
         $this->targetAccounts = [];
         $this->targetTypes    = [];
+        bcscale(12);
     }
 
     /**
