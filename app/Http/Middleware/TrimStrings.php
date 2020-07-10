@@ -1,4 +1,5 @@
 <?php
+
 /**
  * TrimStrings.php
  * Copyright (c) 2020 james@firefly-iii.org
@@ -19,6 +20,8 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
 
 namespace App\Http\Middleware;
 
