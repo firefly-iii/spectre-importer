@@ -60,6 +60,7 @@ class GenerateTransactions
     {
         $this->targetAccounts = [];
         $this->targetTypes    = [];
+        bcscale(12);
     }
 
     /**
@@ -137,6 +138,7 @@ class GenerateTransactions
     private function generateTransaction(int $spectreAccountId, array $entry): array
     {
 
+        Log::debug('Original Spectre transaction', $entry);
         $return = [
             'apply_rules'             => $this->configuration->isRules(),
             'error_if_duplicate_hash' => true,

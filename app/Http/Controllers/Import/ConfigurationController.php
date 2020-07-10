@@ -31,7 +31,6 @@ use App\Services\Configuration\Configuration;
 use App\Services\Session\Constants;
 use App\Services\Spectre\Model\Account;
 use App\Services\Spectre\Request\GetAccountsRequest as SpectreGetAccountsRequest;
-use App\Services\Storage\StorageService;
 use GrumpyDictator\FFIIIApiSupport\Request\GetAccountsRequest;
 use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Http\Request;
@@ -55,6 +54,7 @@ class ConfigurationController extends Controller
         app('log')->debug(sprintf('Now at %s', __METHOD__));
         $mainTitle = 'Import from Spectre';
         $subTitle  = 'Configure your Spectre import';
+        $pageTitle = 'Configuration';
 
         $configuration = Configuration::fromArray([]);
         if (session()->has(Constants::CONFIGURATION)) {
@@ -103,7 +103,7 @@ class ConfigurationController extends Controller
         }
 
         // view for config:
-        return view('import.configuration.index', compact('ff3Accounts', 'spectreAccountList', 'configuration', 'mainTitle', 'subTitle'));
+        return view('import.configuration.index', compact('ff3Accounts', 'spectreAccountList', 'configuration', 'mainTitle', 'subTitle', 'pageTitle'));
     }
 
     /**

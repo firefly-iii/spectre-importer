@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * api.php
  * Copyright (c) 2020 james@firefly-iii.org
