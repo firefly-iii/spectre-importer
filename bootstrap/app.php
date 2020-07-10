@@ -1,4 +1,5 @@
 <?php
+
 /**
  * app.php
  * Copyright (c) 2020 james@firefly-iii.org
@@ -19,6 +20,28 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+
+declare(strict_types=1);
+
+bcscale(12);
+
+if (!function_exists('envNonEmpty')) {
+    /**
+     * @param string $key
+     * @param null   $default
+     *
+     * @return mixed|null
+     */
+    function envNonEmpty(string $key, $default = null)
+    {
+        $result = env($key, $default);
+        if (is_string($result) && '' === $result) {
+            $result = $default;
+        }
+
+        return $result;
+    }
+}
 
 /*
 |--------------------------------------------------------------------------

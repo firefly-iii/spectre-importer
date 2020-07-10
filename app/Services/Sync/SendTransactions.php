@@ -50,6 +50,7 @@ class SendTransactions
     private bool   $addTag;
     private string $tag;
     private string $tagDate;
+    private string $rootURI;
 
     /**
      * @param array $transactions
@@ -62,6 +63,12 @@ class SendTransactions
         $this->tag     = sprintf('Spectre Import on %s', date('Y-m-d \@ H:i'));
         $this->tagDate = date('Y-m-d');
         $this->createTag();
+
+        $this->rootURI = config('spectre.uri');
+        if ('' !== (string) config('spectre.vanity_uri')) {
+            $this->rootURI = config('spectre.vanity_uri');
+        }
+        Log::debug(sprintf('The root URI is "%s"', $this->rootURI));
 
         $uri   = (string) config('spectre.uri');
         $token = (string) config('spectre.access_token');
@@ -207,8 +214,7 @@ class SendTransactions
             return null;
         }
         $groupId  = $group->id;
-        $uri      = (string) config('spectre.uri');
-        $groupUri = (string) sprintf('%s/transactions/show/%d', $uri, $groupId);
+        $groupUri = (string) sprintf('%s/transactions/show/%d', $this->rootURI, $groupId);
 
         /** @var Transaction $tr */
         foreach ($group->transactions as $tr) {
