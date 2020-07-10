@@ -35,10 +35,8 @@ use Iterator;
  */
 class ListConnectionsResponse extends Response implements Iterator, Countable
 {
-    /** @var Collection */
-    private $collection;
-    /** @var int */
-    private $position = 0;
+    private Collection $collection;
+    private int        $position = 0;
 
     /**
      * @inheritDoc
