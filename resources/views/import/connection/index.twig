@@ -45,7 +45,7 @@
                                 <td>
                                     <input
                                             {% if item.status == 'disabled' %}disabled{% endif %}
-
+                                            {% if configuration.getConnection == item.id %}checked="checked"{% endif %}
                                             id="{{ item.id }}" type="radio" {% if list|length == 1%}checked{% endif%} name="spectre_connection_id" value="{{ item.id }}">
                                 </td>
                                 <td>
@@ -64,7 +64,7 @@
                         {% endfor %}
                         <tr>
                             <td>
-                                <input id="new_login" type="radio" name="spectre_connection_id" value="00" checked>
+                                <input id="new_login" type="radio" name="spectre_connection_id" value="00" {% if configuration.getConnection == 0 %}checked="checked"{% endif %}>
                             </td>
                             <td colspan="3">
                                 <label for="new_login"><em>
