@@ -435,10 +435,16 @@ class Configuration
                 $this->dateNotBefore = self::calcDateNotBefore($this->dateRangeUnit, $this->dateRangeNumber);
                 break;
             case 'range':
-                $before = $this->dateNotBefore;
-                $after  = $this->dateNotAfter;
+                $before = $this->dateNotBefore; // string
+                $after  = $this->dateNotAfter; // string
+                if (null !== $before) {
+                    $before = Carbon::createFromFormat('Y-m-d', $before);
+                }
+                if (null !== $after) {
+                    $after = Carbon::createFromFormat('Y-m-d', $after);
+                }
 
-                if (null !== $before && null !== $after && $this->dateNotBefore > $this->dateNotAfter) {
+                if (null !== $before && null !== $after && $before > $after) {
                     [$before, $after] = [$after, $before];
                 }
 
