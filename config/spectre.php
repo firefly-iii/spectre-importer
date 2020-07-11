@@ -38,6 +38,6 @@ return [
 
     'connection' => [
         'verify'  => env('VERIFY_TLS_SECURITY', true),
-        'timeout' => env('CONNECTION_TIMEOUT', 3.14),
+        'timeout' => (float) env('CONNECTION_TIMEOUT', 3.14),
     ],
 ];
