@@ -39,16 +39,17 @@ class ConfigurationPostRequest extends Request
         $doImport = $this->get('do_import') ?? [];
 
         return [
-            'do_import'         => $doImport,
-            'rules'             => $this->convertBoolean($this->get('rules')),
-            'skip_form'         => $this->convertBoolean($this->get('skip_form')),
-            'date_range'        => $this->string('date_range'),
-            'date_range_number' => $this->integer('date_range_number'),
-            'date_range_unit'   => $this->string('date_range_unit'),
-            'date_not_before'   => $this->date('date_not_before'),
-            'date_not_after'    => $this->date('date_not_after'),
-            'do_mapping'        => $this->convertBoolean($this->get('do_mapping')),
-            'accounts'          => $this->get('accounts'),
+            'do_import'                 => $doImport,
+            'rules'                     => $this->convertBoolean($this->get('rules')),
+            'skip_form'                 => $this->convertBoolean($this->get('skip_form')),
+            'ignore_spectre_categories' => $this->convertBoolean($this->get('ignore_spectre_categories')),
+            'date_range'                => $this->string('date_range'),
+            'date_range_number'         => $this->integer('date_range_number'),
+            'date_range_unit'           => $this->string('date_range_unit'),
+            'date_not_before'           => $this->date('date_not_before'),
+            'date_not_after'            => $this->date('date_not_after'),
+            'do_mapping'                => $this->convertBoolean($this->get('do_mapping')),
+            'accounts'                  => $this->get('accounts'),
         ];
     }
 

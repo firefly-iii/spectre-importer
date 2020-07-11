@@ -208,7 +208,9 @@ class MappingController extends Controller
         foreach ($array as $accountId => $transactions) {
             /** @var array $transaction */
             foreach ($transactions as $transaction) {
-                $categories[] = $transaction['category'];
+                if (isset($transaction['category'])) {
+                    $categories[] = $transaction['category'];
+                }
             }
         }
         $filtered = array_filter(

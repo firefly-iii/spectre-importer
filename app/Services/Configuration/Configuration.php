@@ -54,22 +54,14 @@ class Configuration
 {
     /** @var int */
     public const VERSION = 1;
-    private bool $addImportTag;
-
-    /** @var bool When set to true, the importer will ignore existing duplicate transactions found in Firefly III. */
-    private $ignoreDuplicateTransactions;
-    /** @var array */
-    private $mapping;
-    /** @var bool */
-    private $rules;
-    /** @var bool */
-    private $skipForm;
-    /** @var int */
-    private $version;
-
+    private bool    $addImportTag;
+    private bool    $ignoreDuplicateTransactions;
+    private array   $mapping;
+    private bool    $rules;
+    private bool    $skipForm;
+    private int     $version;
     private ?string $dateNotAfter;
     private ?string $dateNotBefore;
-
     private ?int    $dateRangeNumber;
     private ?string $dateRangeUnit;
     private ?string $dateRange;
@@ -78,6 +70,7 @@ class Configuration
     private int     $identifier;
     private bool    $doMapping;
     private array   $accountTypes;
+    private bool    $ignoreSpectreCategories;
 
     /**
      * Configuration constructor.
@@ -88,6 +81,7 @@ class Configuration
         $this->rules                       = true;
         $this->skipForm                    = false;
         $this->addImportTag                = true;
+        $this->ignoreSpectreCategories     = false;
         $this->mapping                     = [
             'accounts'   => [],
             'categories' => [],
@@ -119,6 +113,7 @@ class Configuration
         $object->rules                       = $array['rules'] ?? true;
         $object->skipForm                    = $array['skip_form'] ?? false;
         $object->addImportTag                = $array['add_import_tag'] ?? true;
+        $object->ignoreSpectreCategories     = $array['ignore_spectre_categories'] ?? false;
         $object->mapping                     = $array['mapping'] ?? ['accounts' => [], 'categories' => []];
         $object->doMapping                   = $array['do_mapping'] ?? false;
         $object->identifier                  = $array['identifier'] ?? 0;
@@ -313,6 +308,24 @@ class Configuration
     }
 
     /**
+     * @return bool
+     */
+    public function isIgnoreSpectreCategories(): bool
+    {
+        return $this->ignoreSpectreCategories;
+    }
+
+    /**
+     * @param bool $ignoreSpectreCategories
+     */
+    public function setIgnoreSpectreCategories(bool $ignoreSpectreCategories): void
+    {
+        $this->ignoreSpectreCategories = $ignoreSpectreCategories;
+    }
+
+
+
+    /**
      * @return array
      */
     public function getAccounts(): array
@@ -502,6 +515,7 @@ class Configuration
             'date_not_before'               => $this->dateNotBefore,
             'date_not_after'                => $this->dateNotAfter,
             'account_types'                 => $this->accountTypes,
+            'ignore_spectre_categories'     => $this->ignoreSpectreCategories,
         ];
         //Log::debug('Configuration::toArray', $array);
 

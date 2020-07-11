@@ -135,6 +135,7 @@ class ConfigurationController extends Controller
         $configuration->setDateRangeUnit($fromRequest['date_range_unit']);
         $configuration->setDateRange($fromRequest['date_range']);
         $configuration->setDoMapping($fromRequest['do_mapping']);
+        $configuration->setIgnoreSpectreCategories($fromRequest['ignore_spectre_categories']);
 
         // loop accounts:
         $accounts = [];
