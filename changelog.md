@@ -2,7 +2,7 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-## [1.0.3] - Unreleased
+## [1.0.3] - 2020-07-12
 
 ### Changed
 - Can now use a vanity URL. See the example environment variables file, `.env.example` for instructions.
