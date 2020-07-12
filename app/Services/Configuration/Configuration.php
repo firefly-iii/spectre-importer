@@ -126,6 +126,7 @@ class Configuration
         $object->dateNotAfter                = $array['date_not_after'] ?? '';
         $object->accountTypes                = $array['account_types'] ?? [];
         $object->version                     = $version;
+        $object->updateDateRange();
 
         return $object;
     }
@@ -435,19 +436,24 @@ class Configuration
      */
     public function updateDateRange(): void
     {
+        Log::debug('Now in updateDateRange()');
         // set date and time:
         switch ($this->dateRange) {
             case 'all':
+                Log::debug('Range is null, set all to NULL.');
                 $this->dateRangeUnit   = null;
                 $this->dateRangeNumber = null;
-                $this->dateNotBefore   = null;
-                $this->dateNotAfter    = null;
+                $this->dateNotBefore   = '';
+                $this->dateNotAfter    = '';
                 break;
             case 'partial':
-                $this->dateNotAfter  = null;
+                Log::debug('Range is partial, after is NULL, dateNotBefore will be calculated.');
+                $this->dateNotAfter  = '';
                 $this->dateNotBefore = self::calcDateNotBefore($this->dateRangeUnit, $this->dateRangeNumber);
+                Log::debug(sprintf('dateNotBefore is now "%s"', $this->dateNotBefore));
                 break;
             case 'range':
+                Log::debug('Range is "range", both will be created from a string.');
                 $before = $this->dateNotBefore; // string
                 $after  = $this->dateNotAfter; // string
                 if (null !== $before) {
@@ -461,8 +467,9 @@ class Configuration
                     [$before, $after] = [$after, $before];
                 }
 
-                $this->dateNotBefore = null === $before ? null : $before->format('Y-m-d');
-                $this->dateNotAfter  = null === $after ? null : $after->format('Y-m-d');
+                $this->dateNotBefore = null === $before ? '' : $before->format('Y-m-d');
+                $this->dateNotAfter  = null === $after ? '' : $after->format('Y-m-d');
+                Log::debug(sprintf('dateNotBefore is now "%s", dateNotAfter is "%s"', $this->dateNotBefore, $this->dateNotAfter));
         }
     }
 
