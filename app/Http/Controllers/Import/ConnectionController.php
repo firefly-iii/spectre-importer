@@ -123,7 +123,7 @@ class ConnectionController extends Controller
             throw new ImportException(sprintf('%s: %s', $list->class, $list->message));
         }
 
-        return view('import.connection.index', compact('mainTitle', 'subTitle', 'list', 'identifier'));
+        return view('import.connection.index', compact('mainTitle', 'subTitle', 'list', 'identifier', 'configuration'));
     }
 
     /**

@@ -24,9 +24,10 @@ declare(strict_types=1);
 
 
 return [
-    'version'         => '1.0.2',
+    'version'         => '1.0.3',
     'access_token'    => env('FIREFLY_III_ACCESS_TOKEN'),
     'uri'             => env('FIREFLY_III_URI'),
+    'vanity_uri'      => envNonEmpty('VANITY_URI'),
     'upload_path'     => storage_path('uploads'),
     'minimum_version' => '5.3.0',
     'spectre_app_id'  => env('SPECTRE_APP_ID', ''),
@@ -35,8 +36,8 @@ return [
     'skip_key_step'   => false,
     'trusted_proxies' => env('TRUSTED_PROXIES', ''),
 
-    'connection'          => [
+    'connection' => [
         'verify'  => env('VERIFY_TLS_SECURITY', true),
-        'timeout' => env('CONNECTION_TIMEOUT', 3.14),
+        'timeout' => (float) env('CONNECTION_TIMEOUT', 3.14),
     ],
 ];

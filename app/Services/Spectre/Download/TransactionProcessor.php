@@ -106,6 +106,12 @@ class TransactionProcessor
     private function filterTransactions(GetTransactionsResponse $transactions): array
     {
         Log::debug(sprintf('Going to filter downloaded transactions. Original set length is %d', count($transactions)));
+        if(null !== $this->notBefore) {
+            Log::debug(sprintf('Will not grab transactions before "%s"', $this->notBefore->format('Y-m-d H:i:s')));
+        }
+        if(null !== $this->notAfter) {
+            Log::debug(sprintf('Will not grab transactions after "%s"', $this->notAfter->format('Y-m-d H:i:s')));
+        }
         $return = [];
         /** @var Transaction $transaction */
         foreach ($transactions as $transaction) {

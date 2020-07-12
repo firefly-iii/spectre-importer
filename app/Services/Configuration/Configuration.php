@@ -54,22 +54,14 @@ class Configuration
 {
     /** @var int */
     public const VERSION = 1;
-    private bool $addImportTag;
-
-    /** @var bool When set to true, the importer will ignore existing duplicate transactions found in Firefly III. */
-    private $ignoreDuplicateTransactions;
-    /** @var array */
-    private $mapping;
-    /** @var bool */
-    private $rules;
-    /** @var bool */
-    private $skipForm;
-    /** @var int */
-    private $version;
-
+    private bool    $addImportTag;
+    private bool    $ignoreDuplicateTransactions;
+    private array   $mapping;
+    private bool    $rules;
+    private bool    $skipForm;
+    private int     $version;
     private ?string $dateNotAfter;
     private ?string $dateNotBefore;
-
     private ?int    $dateRangeNumber;
     private ?string $dateRangeUnit;
     private ?string $dateRange;
@@ -78,6 +70,7 @@ class Configuration
     private int     $identifier;
     private bool    $doMapping;
     private array   $accountTypes;
+    private bool    $ignoreSpectreCategories;
 
     /**
      * Configuration constructor.
@@ -88,6 +81,7 @@ class Configuration
         $this->rules                       = true;
         $this->skipForm                    = false;
         $this->addImportTag                = true;
+        $this->ignoreSpectreCategories     = false;
         $this->mapping                     = [
             'accounts'   => [],
             'categories' => [],
@@ -119,6 +113,7 @@ class Configuration
         $object->rules                       = $array['rules'] ?? true;
         $object->skipForm                    = $array['skip_form'] ?? false;
         $object->addImportTag                = $array['add_import_tag'] ?? true;
+        $object->ignoreSpectreCategories     = $array['ignore_spectre_categories'] ?? false;
         $object->mapping                     = $array['mapping'] ?? ['accounts' => [], 'categories' => []];
         $object->doMapping                   = $array['do_mapping'] ?? false;
         $object->identifier                  = $array['identifier'] ?? 0;
@@ -131,6 +126,7 @@ class Configuration
         $object->dateNotAfter                = $array['date_not_after'] ?? '';
         $object->accountTypes                = $array['account_types'] ?? [];
         $object->version                     = $version;
+        $object->updateDateRange();
 
         return $object;
     }
@@ -313,6 +309,24 @@ class Configuration
     }
 
     /**
+     * @return bool
+     */
+    public function isIgnoreSpectreCategories(): bool
+    {
+        return $this->ignoreSpectreCategories;
+    }
+
+    /**
+     * @param bool $ignoreSpectreCategories
+     */
+    public function setIgnoreSpectreCategories(bool $ignoreSpectreCategories): void
+    {
+        $this->ignoreSpectreCategories = $ignoreSpectreCategories;
+    }
+
+
+
+    /**
      * @return array
      */
     public function getAccounts(): array
@@ -422,28 +436,40 @@ class Configuration
      */
     public function updateDateRange(): void
     {
+        Log::debug('Now in updateDateRange()');
         // set date and time:
         switch ($this->dateRange) {
             case 'all':
+                Log::debug('Range is null, set all to NULL.');
                 $this->dateRangeUnit   = null;
                 $this->dateRangeNumber = null;
-                $this->dateNotBefore   = null;
-                $this->dateNotAfter    = null;
+                $this->dateNotBefore   = '';
+                $this->dateNotAfter    = '';
                 break;
             case 'partial':
-                $this->dateNotAfter  = null;
+                Log::debug('Range is partial, after is NULL, dateNotBefore will be calculated.');
+                $this->dateNotAfter  = '';
                 $this->dateNotBefore = self::calcDateNotBefore($this->dateRangeUnit, $this->dateRangeNumber);
+                Log::debug(sprintf('dateNotBefore is now "%s"', $this->dateNotBefore));
                 break;
             case 'range':
-                $before = $this->dateNotBefore;
-                $after  = $this->dateNotAfter;
+                Log::debug('Range is "range", both will be created from a string.');
+                $before = $this->dateNotBefore; // string
+                $after  = $this->dateNotAfter; // string
+                if (null !== $before) {
+                    $before = Carbon::createFromFormat('Y-m-d', $before);
+                }
+                if (null !== $after) {
+                    $after = Carbon::createFromFormat('Y-m-d', $after);
+                }
 
-                if (null !== $before && null !== $after && $this->dateNotBefore > $this->dateNotAfter) {
+                if (null !== $before && null !== $after && $before > $after) {
                     [$before, $after] = [$after, $before];
                 }
 
-                $this->dateNotBefore = null === $before ? null : $before->format('Y-m-d');
-                $this->dateNotAfter  = null === $after ? null : $after->format('Y-m-d');
+                $this->dateNotBefore = null === $before ? '' : $before->format('Y-m-d');
+                $this->dateNotAfter  = null === $after ? '' : $after->format('Y-m-d');
+                Log::debug(sprintf('dateNotBefore is now "%s", dateNotAfter is "%s"', $this->dateNotBefore, $this->dateNotAfter));
         }
     }
 
@@ -496,6 +522,7 @@ class Configuration
             'date_not_before'               => $this->dateNotBefore,
             'date_not_after'                => $this->dateNotAfter,
             'account_types'                 => $this->accountTypes,
+            'ignore_spectre_categories'     => $this->ignoreSpectreCategories,
         ];
         //Log::debug('Configuration::toArray', $array);
 

@@ -157,6 +157,9 @@ class GenerateTransactions
                 ],
             ],
         ];
+        if($this->configuration->isIgnoreSpectreCategories()) {
+            unset($return['transactions'][0]['tags'], $return['transactions'][0]['category_name'], $return['transactions'][0]['category_id']);
+        }
         // save meta:
         $return['transactions'][0]['external_id']        = $entry['id'];
         $return['transactions'][0]['internal_reference'] = $spectreAccountId;
