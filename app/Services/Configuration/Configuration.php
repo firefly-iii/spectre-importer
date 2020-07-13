@@ -441,8 +441,8 @@ class Configuration
         switch ($this->dateRange) {
             case 'all':
                 Log::debug('Range is null, set all to NULL.');
-                $this->dateRangeUnit   = null;
-                $this->dateRangeNumber = null;
+                $this->dateRangeUnit   = 'd';
+                $this->dateRangeNumber = 0;
                 $this->dateNotBefore   = '';
                 $this->dateNotAfter    = '';
                 break;
