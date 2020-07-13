@@ -63,15 +63,16 @@ class TransactionProcessor
         $accounts = array_keys($this->configuration->getAccounts());
         $return   = [];
         foreach ($accounts as $account) {
-            Log::debug(sprintf('Going to download transactions for account #%d', $account));
+            $account = (string) $account;
+            Log::debug(sprintf('Going to download transactions for account #%s', $account));
             $uri                   = config('spectre.spectre_uri');
             $appId                 = config('spectre.spectre_app_id');
             $secret                = config('spectre.spectre_secret');
             $request               = new GetTransactionsRequest($uri, $appId, $secret);
-            $request->accountId    = (string) $account;
-            $request->connectionId = (string) $this->configuration->getConnection();
+            $request->accountId    = $account;
+            $request->connectionId = $this->configuration->getConnection();
             /** @var GetTransactionsResponse $transactions */
-            $transactions          = $request->get();
+            $transactions = $request->get();
             /*
              * Getting a Response object means that the Transaction objects are basically cast back into an array making this
              * exercise pretty pointless (from array to object back to array).
@@ -138,6 +139,7 @@ class TransactionProcessor
 
                 continue;
             }
+            app('log')->info(sprintf('Include transaction because date is "%s".', $madeOn->format(self::DATE_TIME_FORMAT),));
             $return[] = $transaction->toArray();
         }
         Log::debug(sprintf('After filtering, set is %d transaction(s)', count($return)));

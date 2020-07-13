@@ -113,7 +113,6 @@ class RoutineManager
         $this->configuration = $configuration;
         $this->transactionProcessor->setConfiguration($configuration);
         $this->transactionProcessor->setDownloadIdentifier($this->downloadIdentifier);
-
     }
 
 

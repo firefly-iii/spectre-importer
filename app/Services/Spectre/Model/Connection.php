@@ -35,7 +35,7 @@ class Connection
     public string    $categorization;
     public string    $countryCode;
     public string    $customerId;
-    public int       $id;
+    public string       $id;
     public Carbon    $lastSuccess;
     public ?string   $nextPossibleRefreshAt;
     public string    $providerCode;
@@ -60,7 +60,7 @@ class Connection
     public static function fromArray(array $data): self
     {
         $model                        = new self;
-        $model->id                    = (int) $data['id'];
+        $model->id                    = (string) $data['id'];
         $model->categorization        = $data['categorization'];
         $model->countryCode           = $data['country_code'];
         $model->customerId            = $data['customer_id'];

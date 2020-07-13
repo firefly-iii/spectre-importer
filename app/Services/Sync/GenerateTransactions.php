@@ -72,7 +72,7 @@ class GenerateTransactions
         // send account list request to Firefly III.
         $token   = (string) config('spectre.access_token');
         $uri     = (string) config('spectre.uri');
-        $request = new GetAccountsRequest($uri, $token, (string) config('spectre.trusted_cert'));
+        $request = new GetAccountsRequest($uri, $token);
         /** @var GetAccountsResponse $result */
         $result = $request->get();
         $return = [];
@@ -105,10 +105,13 @@ class GenerateTransactions
     public function getTransactions(array $spectre): array
     {
         $return = [];
-        /** @var array $entry */
+        /**
+         * @var string $spectreAccountId
+         * @var array $entries
+         */
         foreach ($spectre as $spectreAccountId => $entries) {
-            $spectreAccountId = (int) $spectreAccountId;
-            app('log')->debug(sprintf('Going to parse account #%d', $spectreAccountId));
+            $spectreAccountId = (string)$spectreAccountId;
+            app('log')->debug(sprintf('Going to parse account #%s', $spectreAccountId));
             foreach ($entries as $entry) {
                 $return[] = $this->generateTransaction($spectreAccountId, $entry);
                 // TODO error handling at this point.
@@ -129,13 +132,13 @@ class GenerateTransactions
     }
 
     /**
-     * @param int   $spectreAccountId
+     * @param string   $spectreAccountId
      * @param array $entry
      *
      * @throws ImportException
      * @return array
      */
-    private function generateTransaction(int $spectreAccountId, array $entry): array
+    private function generateTransaction(string $spectreAccountId, array $entry): array
     {
 
         Log::debug('Original Spectre transaction', $entry);
@@ -220,7 +223,7 @@ class GenerateTransactions
         $uri   = (string) config('spectre.uri');
         $token = (string) config('spectre.access_token');
         app('log')->debug(sprintf('Going to download account #%d', $accountId));
-        $request = new GetAccountRequest($uri, $token, (string) config('spectre.trusted_cert'));
+        $request = new GetAccountRequest($uri, $token);
         $request->setId($accountId);
         /** @var GetAccountResponse $result */
         $result = $request->get();

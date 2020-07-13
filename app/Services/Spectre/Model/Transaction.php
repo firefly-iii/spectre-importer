@@ -40,7 +40,7 @@ class Transaction
     public string              $description;
     public bool                $duplicated;
     public TransactionExtra    $extra;
-    public int                 $id;
+    public string                 $id;
     public Carbon              $madeOn;
     public string              $mode;
     public string              $status;
@@ -61,7 +61,7 @@ class Transaction
     public static function fromArray(array $data): self
     {
         $model               = new self;
-        $model->id           = (int) $data['id'];
+        $model->id           = (string) $data['id'];
         $model->mode         = $data['mode'];
         $model->status       = $data['status'];
         $model->madeOn       = new Carbon($data['made_on']);
@@ -84,7 +84,7 @@ class Transaction
     public function toArray(): array
     {
         return [
-            'id'            => $this->id,
+            'id'            => (string) $this->id,
             'account_id'    => $this->accountId,
             'made_on'       => $this->madeOn ? $this->madeOn->toW3cString(): '',
             'created_at'    => $this->createdAt ? $this->createdAt->toW3cString(): '',

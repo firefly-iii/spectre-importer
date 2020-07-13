@@ -25,7 +25,6 @@ declare(strict_types=1);
 namespace App\Services\Spectre\Request;
 
 
-use App\Exceptions\SpectreHttpException;
 use App\Services\Spectre\Response\GetTransactionsResponse;
 use App\Services\Spectre\Response\Response;
 use Log;

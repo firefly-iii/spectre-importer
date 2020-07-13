@@ -36,7 +36,7 @@ use Log;
  */
 class GetAccountsRequest extends Request
 {
-    public int $connection;
+    public string $connection;
 
 
     /**

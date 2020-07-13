@@ -101,7 +101,7 @@ class ConnectionController extends Controller
         if (session()->has(Constants::CONFIGURATION)) {
             $configuration = Configuration::fromArray(session()->get(Constants::CONFIGURATION));
         }
-        $configuration->setIdentifier((int) $identifier);
+        $configuration->setIdentifier($identifier);
 
         // save config
         $json = '[]';
@@ -158,7 +158,7 @@ class ConnectionController extends Controller
         if (session()->has(Constants::CONFIGURATION)) {
             $configuration = Configuration::fromArray(session()->get(Constants::CONFIGURATION));
         }
-        $configuration->setConnection((int) $connectionId);
+        $configuration->setConnection($connectionId);
 
         // save config
         $json = '[]';

@@ -33,7 +33,7 @@ use App\Services\Spectre\Response\Response;
 class PostConnectSessionsRequest extends Request
 {
     /** @var int */
-    public int $customer;
+    public string $customer;
 
     /** @var string */
     public string $uri;
