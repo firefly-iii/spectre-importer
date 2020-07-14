@@ -134,20 +134,6 @@ class ConnectionController extends Controller
     {
         $connectionId = $request->get('spectre_connection_id');
 
-        if ('00' !== $connectionId) {
-            // refresh connection
-            $uri    = config('spectre.spectre_uri');
-            $appId  = config('spectre.spectre_app_id');
-            $secret = config('spectre.spectre_secret');
-            $put    = new PutRefreshConnectionRequest($uri, $appId, $secret);
-            $put->setConnection($connectionId);
-            $response = $put->put();
-            if ($response instanceof ErrorResponse) {
-                Log::alert('Could not refresh connection.');
-                Log::alert(sprintf('%s: %s', $response->class, $response->message));
-            }
-        }
-
         if ('00' === $connectionId) {
             // get identifier
             $configuration = Configuration::fromArray([]);

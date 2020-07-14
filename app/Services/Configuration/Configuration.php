@@ -116,8 +116,8 @@ class Configuration
         $object->ignoreSpectreCategories     = $array['ignore_spectre_categories'] ?? false;
         $object->mapping                     = $array['mapping'] ?? ['accounts' => [], 'categories' => []];
         $object->doMapping                   = $array['do_mapping'] ?? false;
-        $object->identifier                  = (string)($array['identifier'] ?? '0');
-        $object->connection                  = (string)($array['connection'] ?? '0');
+        $object->identifier                  = (string) ($array['identifier'] ?? '0');
+        $object->connection                  = (string) ($array['connection'] ?? '0');
         $object->accounts                    = $array['accounts'] ?? [];
         $object->dateRange                   = $array['date_range'] ?? 'all';
         $object->dateRangeNumber             = $array['date_range_number'] ?? 30;

@@ -2,6 +2,15 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.0.4] - 2020-07-14
+
+- #3511 Environment variable for custom Firefly III URL.
+- #3543 #3544 #3548 Unexpected NULL pointer
+- #3549 Extra debug code
+- #3592 Integer overflow
+- Added option to ignore Spectre's categorization.
+- Auto refresh Spectre connections.
+
 ## [1.0.3] - 2020-07-12
 
 ### Changed

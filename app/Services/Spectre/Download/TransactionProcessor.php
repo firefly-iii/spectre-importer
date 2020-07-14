@@ -27,6 +27,8 @@ namespace App\Services\Spectre\Download;
 use App\Services\Configuration\Configuration;
 use App\Services\Spectre\Model\Transaction;
 use App\Services\Spectre\Request\GetTransactionsRequest;
+use App\Services\Spectre\Request\PutRefreshConnectionRequest;
+use App\Services\Spectre\Response\ErrorResponse;
 use App\Services\Spectre\Response\GetTransactionsResponse;
 use Carbon\Carbon;
 use Log;
@@ -49,6 +51,7 @@ class TransactionProcessor
      */
     public function download(): array
     {
+        $this->refreshConnection();
         $this->notBefore = null;
         $this->notAfter = null;
         if ('' !== (string) $this->configuration->getDateNotBefore()) {
@@ -145,6 +148,24 @@ class TransactionProcessor
         Log::debug(sprintf('After filtering, set is %d transaction(s)', count($return)));
 
         return $return;
+    }
+
+    /**
+     * @throws \App\Exceptions\SpectreHttpException
+     */
+    private function refreshConnection(): void
+    {
+        // refresh connection
+        $uri    = config('spectre.spectre_uri');
+        $appId  = config('spectre.spectre_app_id');
+        $secret = config('spectre.spectre_secret');
+        $put    = new PutRefreshConnectionRequest($uri, $appId, $secret);
+        $put->setConnection($this->configuration->getConnection());
+        $response = $put->put();
+        if ($response instanceof ErrorResponse) {
+            Log::alert('Could not refresh connection.');
+            Log::alert(sprintf('%s: %s', $response->class, $response->message));
+        }
     }
 
 }

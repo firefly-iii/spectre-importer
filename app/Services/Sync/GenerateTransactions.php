@@ -141,7 +141,7 @@ class GenerateTransactions
     private function generateTransaction(string $spectreAccountId, array $entry): array
     {
 
-        Log::debug('Original Spectre transaction', $entry);
+        //Log::debug('Original Spectre transaction', $entry);
         $return = [
             'apply_rules'             => $this->configuration->isRules(),
             'error_if_duplicate_hash' => true,
@@ -161,14 +161,15 @@ class GenerateTransactions
             ],
         ];
         if($this->configuration->isIgnoreSpectreCategories()) {
+            Log::debug('Remove Spectre categories + tags.');
             unset($return['transactions'][0]['tags'], $return['transactions'][0]['category_name'], $return['transactions'][0]['category_id']);
         }
         // save meta:
         $return['transactions'][0]['external_id']        = $entry['id'];
         $return['transactions'][0]['internal_reference'] = $spectreAccountId;
 
-
         if (1 === bccomp($entry['amount'], '0')) {
+            Log::debug('Amount is positive: assume transfer or deposit.');
             // amount is positive: deposit or transfer. Spectre account is destination
             $return['transactions'][0]['type']   = 'deposit';
             $return['transactions'][0]['amount'] = $entry['amount'];
@@ -179,18 +180,27 @@ class GenerateTransactions
             // source is the other side:
             $return['transactions'][0]['source_name'] = $entry['extra']['payee'] ?? '(unknown source account)';
 
-            $mappedId = $this->getMappedId($return['transactions'][0]['source_name']);
+            $mappedId = $this->getMappedAccountId($return['transactions'][0]['source_name']);
             if (null !== $mappedId && 0 !== $mappedId) {
-                $mappedType                             = $this->getMappedType($mappedId);
-                $return['transactions'][0]['type']      = $this->getTransactionType($mappedType, 'asset');
+                Log::debug(sprintf('Account name "%s" is mapped to Firefly III account ID "%d"', $return['transactions'][0]['source_name'], $mappedId));
+                $mappedType                             = $this->getMappedAccountType($mappedId);
+                $originalSourceName                     = $return['transactions'][0]['source_name'];
                 $return['transactions'][0]['source_id'] = $mappedId;
-                unset($return['transactions'][0]['source_name']);
+                // catch error here:
+                try {
+                    $return['transactions'][0]['type'] = $this->getTransactionType($mappedType, 'asset');
+                } catch (ImportException $e) {
+                    Log::error($e->getMessage());
+                    Log::info('Will not use mapped ID, Firefly III account is of the wrong type.');
+                    unset($return['transactions'][0]['source_id']);
+                    $return['transactions'][0]['source_name'] = $originalSourceName;
+                }
             }
-            //Log::debug(sprintf('Mapped ID is %s', var_export($mappedId, true)));
         }
 
         if (-1 === bccomp($entry['amount'], '0')) {
             // amount is negative: withdrawal or transfer.
+            Log::debug('Amount is negative: assume transfer or withdrawal.');
             $return['transactions'][0]['amount'] = bcmul($entry['amount'], '-1');
 
             // source is Spectre:
@@ -198,13 +208,22 @@ class GenerateTransactions
             // dest is shop
             $return['transactions'][0]['destination_name'] = $entry['extra']['payee'] ?? '(unknown destination account)';
 
-            $mappedId = $this->getMappedId($return['transactions'][0]['destination_name']);
-            //Log::debug(sprintf('Mapped ID is %s', var_export($mappedId, true)));
+            $mappedId = $this->getMappedAccountId($return['transactions'][0]['destination_name']);
+
             if (null !== $mappedId && 0 !== $mappedId) {
+                Log::debug(sprintf('Account name "%s" is mapped to Firefly III account ID "%d"', $return['transactions'][0]['source_name'], $mappedId));
+                $mappedType                                  = $this->getMappedAccountType($mappedId);
+                $originalDestName                            = $return['transactions'][0]['destination_name'];
                 $return['transactions'][0]['destination_id'] = $mappedId;
-                $mappedType                                  = $this->getMappedType($mappedId);
-                $return['transactions'][0]['type']           = $this->getTransactionType('asset', $mappedType);
-                unset($return['transactions'][0]['destination_name']);
+                // catch error here:
+                try {
+                    $return['transactions'][0]['type'] = $this->getTransactionType('asset', $mappedType);
+                } catch (ImportException $e) {
+                    Log::error($e->getMessage());
+                    Log::info('Will not use mapped ID, Firefly III account is of the wrong type.');
+                    unset($return['transactions'][0]['destination_id']);
+                    $return['transactions'][0]['destination_name'] = $originalDestName;
+                }
             }
         }
         app('log')->debug(sprintf('Parsed Spectre transaction #%d', $entry['id']));
@@ -240,9 +259,9 @@ class GenerateTransactions
      *
      * @return int|null
      */
-    private function getMappedId(string $name): ?int
+    private function getMappedAccountId(string $name): ?int
     {
-        if (isset($this->configuration->getMapping()[$name])) {
+        if (isset($this->configuration->getMapping()['accounts'][$name])) {
             return (int) $this->configuration->getMapping()['accounts'][$name];
         }
 
@@ -254,7 +273,7 @@ class GenerateTransactions
      *
      * @return string
      */
-    private function getMappedType(int $mappedId): string
+    private function getMappedAccountType(int $mappedId): string
     {
         if (!isset($this->configuration->getAccountTypes()[$mappedId])) {
             app('log')->warning(sprintf('Cannot find account type for Firefly III account #%d.', $mappedId));
@@ -263,10 +282,14 @@ class GenerateTransactions
             $accountTypes[$mappedId] = $accountType;
             $this->configuration->setAccountTypes($accountTypes);
 
+            Log::debug(sprintf('Account type for Firefly III account #%d is "%s"', $mappedId, $accountType));
+
             return $accountType;
         }
+        $type = $this->configuration->getAccountTypes()[$mappedId] ?? 'expense';
+        Log::debug(sprintf('Account type for Firefly III account #%d is "%s"', $mappedId, $type));
 
-        return $this->configuration->getAccountTypes()[$mappedId] ?? 'expense';
+        return $type;
     }
 
     /**
