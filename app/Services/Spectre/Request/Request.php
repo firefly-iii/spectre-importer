@@ -32,6 +32,7 @@ use App\Services\Spectre\Response\Response;
 use Exception;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
+use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Exception\TransferException;
 use JsonException;
 use Log;
@@ -231,7 +232,7 @@ abstract class Request
     }
 
     /**
-     * @param array  $data
+     * @param array $data
      *
      * @throws ImportException
      * @return array
@@ -312,6 +313,75 @@ abstract class Request
         } catch (GuzzleException|Exception $e) {
             Log::error($e->getMessage());
             throw new ImportException(sprintf('Guzzle Exception: %s', $e->getMessage()));
+        }
+
+        try {
+            $body = $res->getBody()->getContents();
+        } catch (RuntimeException $e) {
+            Log::error(sprintf('Could not get body from SpectreRequest::POST result: %s', $e->getMessage()));
+            $body = '{}';
+        }
+
+        $statusCode      = $res->getStatusCode();
+        $responseHeaders = $res->getHeaders();
+
+
+        try {
+            $json = json_decode($body, true, 512, JSON_THROW_ON_ERROR);
+        } catch (JsonException $e) {
+            throw new ImportException($e->getMessage());
+        }
+        $json['ResponseHeaders']    = $responseHeaders;
+        $json['ResponseStatusCode'] = $statusCode;
+
+        return $json;
+    }
+
+    /**
+     * @param array $data
+     *
+     * @throws ImportException
+     * @return array
+     *
+     */
+    protected function sendUnsignedSpectrePut(array $data): array
+    {
+        if ('' === $this->uri) {
+            throw new ImportException('No Spectre server defined');
+        }
+        $fullUri = sprintf('%s/%s', $this->getBase(), $this->getUri());
+        $headers = $this->getDefaultHeaders();
+        $opts    = ['headers' => $headers];
+        $body    = null;
+
+        try {
+            $body = json_encode($data, JSON_THROW_ON_ERROR);
+        } catch (JsonException $e) {
+            Log::error($e->getMessage());
+        }
+        if ('{}' !== (string) $body) {
+            $opts['body'] = $body;
+        }
+        //Log::debug('Final body + headers for spectre UNsigned PUT request:', $opts);
+        try {
+            $client = $this->getClient();
+            $res    = $client->request('PUT', $fullUri, $opts);
+        } catch (RequestException|GuzzleException $e) {
+            // get response.
+            $response = $e->getResponse();
+            if (null !== $response && 406 === $response->getStatusCode()) {
+                // ignore it, just log it.
+                $statusCode                 = $response->getStatusCode();
+                $responseHeaders            = $response->getHeaders();
+                $json                       = json_decode((string) $e->getResponse()->getBody(), true, 512, JSON_THROW_ON_ERROR);
+                $json['ResponseHeaders']    = $responseHeaders;
+                $json['ResponseStatusCode'] = $statusCode;
+
+                return $json;
+            }
+            Log::error($e->getMessage());
+            Log::error((string)$e->getResponse()->getBody());
+            throw new ImportException(sprintf('Request Exception: %s', $e->getMessage()));
         }
 
         try {
