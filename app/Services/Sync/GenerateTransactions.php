@@ -211,7 +211,7 @@ class GenerateTransactions
             $mappedId = $this->getMappedAccountId($return['transactions'][0]['destination_name']);
 
             if (null !== $mappedId && 0 !== $mappedId) {
-                Log::debug(sprintf('Account name "%s" is mapped to Firefly III account ID "%d"', $return['transactions'][0]['source_name'], $mappedId));
+                Log::debug(sprintf('Account name "%s" is mapped to Firefly III account ID "%d"', $return['transactions'][0]['destination_name'], $mappedId));
                 $mappedType                                  = $this->getMappedAccountType($mappedId);
                 $originalDestName                            = $return['transactions'][0]['destination_name'];
                 $return['transactions'][0]['destination_id'] = $mappedId;
