@@ -2,10 +2,23 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.0.4] - 2020-07-17
+
+⚠️ Some changes in this release may break the duplicate transaction detection. Be careful importing large batches.
+
+### Changed
+
+- [Issue 3543](https://github.com/firefly-iii/firefly-iii/issues/3543) [issue 3544](https://github.com/firefly-iii/firefly-iii/issues/3544) [issue 3548](https://github.com/firefly-iii/firefly-iii/issues/3548) Unexpected NULL pointer
+- [Issue 3549](https://github.com/firefly-iii/firefly-iii/issues/3549) Date range may be ignored when importing.
+- [Issue 3592](https://github.com/firefly-iii/firefly-iii/issues/3492) Issue with integer casting
+- ⚠️ [issue 3560](https://github.com/firefly-iii/firefly-iii/issues/3560) Accounts were ignored when mapping.
+- ⚠️ Added option to ignore Spectre's categorization.
+- Auto refresh Spectre connections.
+
 ## [1.0.3] - 2020-07-12
 
 ### Changed
-- Can now use a vanity URL. See the example environment variables file, `.env.example` for instructions.
+- [Issue 3511](https://github.com/firefly-iii/firefly-iii/issues/3511) Can now use a vanity URL. See the example environment variables file, `.env.example` for instructions.
 
 ## [1.0.2] - 2020-07-10
 

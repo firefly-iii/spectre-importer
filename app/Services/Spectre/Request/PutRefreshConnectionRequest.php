@@ -1,6 +1,6 @@
 <?php
 /**
- * GetAccountsRequest.php
+ * PutRefreshConnectionRequest.php
  * Copyright (c) 2020 james@firefly-iii.org
  *
  * This file is part of the Firefly III Spectre importer
@@ -24,23 +24,20 @@ declare(strict_types=1);
 
 namespace App\Services\Spectre\Request;
 
-use App\Exceptions\SpectreErrorException;
 use App\Services\Spectre\Response\ErrorResponse;
-use App\Services\Spectre\Response\GetAccountsResponse;
+use App\Services\Spectre\Response\PutRefreshConnectionResponse;
 use App\Services\Spectre\Response\Response;
 use Log;
 
 /**
- * Class GetAccountsRequest
- * TODO is not yet paginated.
+ * Class PutRefreshConnectionRequest
  */
-class GetAccountsRequest extends Request
+class PutRefreshConnectionRequest extends Request
 {
     public string $connection;
 
-
     /**
-     * ListConnectionsRequest constructor.
+     * ListCustomersRequest constructor.
      *
      * @param string $url
      * @param string $appId
@@ -52,7 +49,7 @@ class GetAccountsRequest extends Request
         $this->setBase($url);
         $this->setAppId($appId);
         $this->setSecret($secret);
-        $this->setUri('accounts');
+        $this->setUri('connections/%s/refresh');
     }
 
     /**
@@ -60,28 +57,6 @@ class GetAccountsRequest extends Request
      */
     public function get(): Response
     {
-        Log::debug('GetAccountsRequest::get()');
-        $this->setParameters(
-            [
-                'connection_id' => $this->connection,
-            ]
-        );
-        try {
-            $response = $this->authenticatedGet();
-        } catch (SpectreErrorException $e) {
-            // JSON thing.
-            return new ErrorResponse($e->json ?? []);
-        }
-
-        return new GetAccountsResponse($response['data']);
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function put(): Response
-    {
-        // TODO: Implement put() method.
     }
 
     /**
@@ -89,6 +64,31 @@ class GetAccountsRequest extends Request
      */
     public function post(): Response
     {
-        // TODO: Implement post() method.
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function put(): Response
+    {
+        $this->setUri(sprintf($this->getUri(), $this->connection));
+
+        $response = $this->sendUnsignedSpectrePut([]);
+
+        // could be error response:
+        if (isset($response['error']) && !isset($response['data'])) {
+            return new ErrorResponse($response);
+        }
+
+        return new PutRefreshConnectionResponse($response['data']);
+    }
+
+    /**
+     * @param string $connection
+     */
+    public function setConnection(string $connection): void
+    {
+        $this->connection = $connection;
+    }
+
 }

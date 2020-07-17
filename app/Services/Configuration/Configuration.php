@@ -66,8 +66,8 @@ class Configuration
     private ?string $dateRangeUnit;
     private ?string $dateRange;
     private array   $accounts;
-    private int     $connection;
-    private int     $identifier;
+    private string     $connection;
+    private string     $identifier;
     private bool    $doMapping;
     private array   $accountTypes;
     private bool    $ignoreSpectreCategories;
@@ -88,8 +88,8 @@ class Configuration
         ];
         $this->doMapping                   = false;
         $this->version                     = self::VERSION;
-        $this->identifier                  = 0;
-        $this->connection                  = 0;
+        $this->identifier                  = '0';
+        $this->connection                  = '0';
         $this->accounts                    = [];
         $this->dateRange                   = 'all';
         $this->dateRangeNumber             = 30;
@@ -116,8 +116,8 @@ class Configuration
         $object->ignoreSpectreCategories     = $array['ignore_spectre_categories'] ?? false;
         $object->mapping                     = $array['mapping'] ?? ['accounts' => [], 'categories' => []];
         $object->doMapping                   = $array['do_mapping'] ?? false;
-        $object->identifier                  = $array['identifier'] ?? 0;
-        $object->connection                  = $array['connection'] ?? 0;
+        $object->identifier                  = (string) ($array['identifier'] ?? '0');
+        $object->connection                  = (string) ($array['connection'] ?? '0');
         $object->accounts                    = $array['accounts'] ?? [];
         $object->dateRange                   = $array['date_range'] ?? 'all';
         $object->dateRangeNumber             = $array['date_range_number'] ?? 30;
@@ -277,33 +277,33 @@ class Configuration
     }
 
     /**
-     * @param int $identifier
+     * @param string $identifier
      */
-    public function setIdentifier(int $identifier): void
+    public function setIdentifier(string $identifier): void
     {
         $this->identifier = $identifier;
     }
 
     /**
-     * @return int
+     * @return string
      */
-    public function getIdentifier(): int
+    public function getIdentifier(): string
     {
         return $this->identifier;
     }
 
     /**
-     * @return int
+     * @return string
      */
-    public function getConnection(): int
+    public function getConnection(): string
     {
         return $this->connection;
     }
 
     /**
-     * @param int $connection
+     * @param string $connection
      */
-    public function setConnection(int $connection): void
+    public function setConnection(string $connection): void
     {
         $this->connection = $connection;
     }
@@ -323,8 +323,6 @@ class Configuration
     {
         $this->ignoreSpectreCategories = $ignoreSpectreCategories;
     }
-
-
 
     /**
      * @return array
@@ -441,8 +439,8 @@ class Configuration
         switch ($this->dateRange) {
             case 'all':
                 Log::debug('Range is null, set all to NULL.');
-                $this->dateRangeUnit   = null;
-                $this->dateRangeNumber = null;
+                $this->dateRangeUnit   = 'd';
+                $this->dateRangeNumber = 30;
                 $this->dateNotBefore   = '';
                 $this->dateNotAfter    = '';
                 break;
@@ -512,8 +510,8 @@ class Configuration
             'add_import_tag'                => $this->addImportTag,
             'do_mapping'                    => $this->doMapping,
             'mapping'                       => $this->mapping,
-            'identifier'                    => $this->identifier,
-            'connection'                    => $this->connection,
+            'identifier'                    => (string) $this->identifier,
+            'connection'                    => (string) $this->connection,
             'version'                       => $this->version,
             'accounts'                      => $this->accounts,
             'date_range'                    => $this->dateRange,
@@ -524,7 +522,6 @@ class Configuration
             'account_types'                 => $this->accountTypes,
             'ignore_spectre_categories'     => $this->ignoreSpectreCategories,
         ];
-        //Log::debug('Configuration::toArray', $array);
 
         return $array;
     }

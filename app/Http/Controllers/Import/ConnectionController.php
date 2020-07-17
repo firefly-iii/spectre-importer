@@ -35,6 +35,7 @@ use App\Services\Spectre\Request\ListConnectionsRequest;
 use App\Services\Spectre\Request\ListCustomersRequest;
 use App\Services\Spectre\Request\PostConnectSessionsRequest;
 use App\Services\Spectre\Request\PostCustomerRequest;
+use App\Services\Spectre\Request\PutRefreshConnectionRequest;
 use App\Services\Spectre\Response\ErrorResponse;
 use App\Services\Spectre\Response\PostConnectSessionResponse;
 use App\Services\Spectre\Response\PostCustomerResponse;
@@ -101,7 +102,7 @@ class ConnectionController extends Controller
         if (session()->has(Constants::CONFIGURATION)) {
             $configuration = Configuration::fromArray(session()->get(Constants::CONFIGURATION));
         }
-        $configuration->setIdentifier((int) $identifier);
+        $configuration->setIdentifier($identifier);
 
         // save config
         $json = '[]';
@@ -132,6 +133,7 @@ class ConnectionController extends Controller
     public function post(Request $request)
     {
         $connectionId = $request->get('spectre_connection_id');
+
         if ('00' === $connectionId) {
             // get identifier
             $configuration = Configuration::fromArray([]);
@@ -158,7 +160,7 @@ class ConnectionController extends Controller
         if (session()->has(Constants::CONFIGURATION)) {
             $configuration = Configuration::fromArray(session()->get(Constants::CONFIGURATION));
         }
-        $configuration->setConnection((int) $connectionId);
+        $configuration->setConnection($connectionId);
 
         // save config
         $json = '[]';
