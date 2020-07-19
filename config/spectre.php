@@ -35,7 +35,6 @@ return [
     'spectre_uri'     => 'https://www.saltedge.com/api/v5',
     'skip_key_step'   => false,
     'trusted_proxies' => env('TRUSTED_PROXIES', ''),
-
     'connection' => [
         'verify'  => env('VERIFY_TLS_SECURITY', true),
         'timeout' => (float) env('CONNECTION_TIMEOUT', 3.14),
