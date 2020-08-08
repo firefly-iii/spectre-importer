@@ -28,17 +28,17 @@
 <!-- MarkdownTOC autolink="true" -->
 
 - [About the Firefly III Salt Edge / Spectre importer](#about-the-firefly-iii-salt-edge--spectre-importer)
-	- [Purpose](#purpose)
-	- [Features](#features)
-	- [Who's it for?](#whos-it-for)
+  - [Purpose](#purpose)
+  - [Features](#features)
+  - [Who's it for?](#whos-it-for)
 - [Getting Started](#getting-started)
-	- [Using the web interface](#using-the-web-interface)
-	- [Using the auto-import](#using-the-auto-import)
+  - [Using the web interface](#using-the-web-interface)
+  - [Using the auto-import](#using-the-auto-import)
 - [Known import challenges](#known-import-challenges)
 - [Other stuff](#other-stuff)
-	- [Contribute](#contribute)
-	- [Support the development of Firefly III and the Spectre API import tool](#support-the-development-of-firefly-iii-and-the-spectre-api-import-tool)
-	- [Contact](#contact)
+  - [Contribute](#contribute)
+  - [Support the development of Firefly III and the Spectre API import tool](#support-the-development-of-firefly-iii-and-the-spectre-api-import-tool)
+  - [Contact](#contact)
 
 <!-- /MarkdownTOC -->
 
@@ -108,7 +108,7 @@ For all other contributions, see below.
 
 If you like this tool and if it helps you save lots of money, why not send me a dime for every dollar saved!
 
-OK that was a joke. You can donate using [PayPal](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=44UKUT455HUFA), [Patreon](https://www.patreon.com/jc5) or the [GitHub Sponsors Program](https://github.com/sponsors/JC5).
+OK that was a joke. You can donate using [PayPal](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=L62W7DVD5ETPC&source=url), [Patreon](https://www.patreon.com/jc5) or the [GitHub Sponsors Program](https://github.com/sponsors/JC5).
 
 This work [is licensed](https://github.com/firefly-iii/spectre-importer/blob/master/LICENSE) under the [GNU Affero General Public License v3](https://www.gnu.org/licenses/agpl-3.0.html).
 
