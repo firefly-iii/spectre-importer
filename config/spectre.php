@@ -22,11 +22,15 @@
 
 declare(strict_types=1);
 
+$fireflyIIIURI = env('FIREFLY_III_URI');
+if('/' === substr($fireflyIIIURI, -1)) {
+    $fireflyIIIURI = rtrim($fireflyIIIURI, '/');
+}
 
 return [
-    'version'         => '1.0.4',
+    'version'         => '1.0.5',
     'access_token'    => env('FIREFLY_III_ACCESS_TOKEN'),
-    'uri'             => env('FIREFLY_III_URI'),
+    'uri'             => $fireflyIIIURI,
     'vanity_uri'      => envNonEmpty('VANITY_URI'),
     'upload_path'     => storage_path('uploads'),
     'minimum_version' => '5.3.0',
