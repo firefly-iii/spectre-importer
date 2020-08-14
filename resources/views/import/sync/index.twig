@@ -12,6 +12,14 @@
                 <h2>{{ subTitle }}</h2>
             </div>
         </div>
+        <div class="row">
+            <div class="col-lg-12">
+                <p>
+                    <small>If the importer seems stuck,
+                        <a href="{{ route('flush') }}" class="text-danger">you can reset it</a>.</small>
+                </p>
+            </div>
+        </div>
         <div id="app">
             <sync-status></sync-status>
         </div>

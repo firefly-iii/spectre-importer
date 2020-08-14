@@ -2,6 +2,14 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.0.5] - 2020-08-14
+
+### Added
+- Reset button.
+
+### Changed
+- URL's with a slash at the end will have the slash removed for consistency.
+
 ## [1.0.4] - 2020-07-17
 
 ⚠️ Some changes in this release may break the duplicate transaction detection. Be careful importing large batches.
