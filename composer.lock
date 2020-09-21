@@ -2213,25 +2213,26 @@
         },
         {
             "name": "rcrowe/twigbridge",
-            "version": "v0.12.1",
+            "version": "v0.12.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/rcrowe/TwigBridge.git",
-                "reference": "c7e4acdfb3d55a055508b9d3cc8cf71c00329e90"
+                "reference": "a4faebbb0c18cf775fda4247c926faa6319ee611"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/rcrowe/TwigBridge/zipball/c7e4acdfb3d55a055508b9d3cc8cf71c00329e90",
-                "reference": "c7e4acdfb3d55a055508b9d3cc8cf71c00329e90",
+                "url": "https://api.github.com/repos/rcrowe/TwigBridge/zipball/a4faebbb0c18cf775fda4247c926faa6319ee611",
+                "reference": "a4faebbb0c18cf775fda4247c926faa6319ee611",
                 "shasum": ""
             },
             "require": {
-                "illuminate/support": "^5.5|^6|^7",
-                "illuminate/view": "^5.5|^6|^7",
+                "illuminate/support": "^5.5|^6|^7|^8",
+                "illuminate/view": "^5.5|^6|^7|^8",
                 "php": ">=7.1",
                 "twig/twig": "^2.11"
             },
             "require-dev": {
+                "ext-json": "*",
                 "laravel/framework": "5.5.*",
                 "mockery/mockery": "0.9.*",
                 "phpunit/phpunit": "~6.0",
@@ -2281,7 +2282,7 @@
                 "laravel",
                 "twig"
             ],
-            "time": "2020-07-03T08:55:51+00:00"
+            "time": "2020-09-07T12:36:34+00:00"
         },
         {
             "name": "swiftmailer/swiftmailer",
