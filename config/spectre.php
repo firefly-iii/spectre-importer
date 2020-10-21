@@ -28,12 +28,12 @@ if('/' === substr($fireflyIIIURI, -1)) {
 }
 
 return [
-    'version'         => '1.0.5',
+    'version'         => '2.0.0',
     'access_token'    => env('FIREFLY_III_ACCESS_TOKEN'),
     'uri'             => $fireflyIIIURI,
     'vanity_uri'      => envNonEmpty('VANITY_URI'),
     'upload_path'     => storage_path('uploads'),
-    'minimum_version' => '5.3.0',
+    'minimum_version' => '5.4.3',
     'spectre_app_id'  => env('SPECTRE_APP_ID', ''),
     'spectre_secret'  => env('SPECTRE_SECRET', ''),
     'spectre_uri'     => 'https://www.saltedge.com/api/v5',
