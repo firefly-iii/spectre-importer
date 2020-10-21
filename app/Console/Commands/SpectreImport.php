@@ -50,7 +50,7 @@ class SpectreImport extends Command
      *
      * @var string
      */
-    protected $signature = 'spectre:import {config : The JSON configuration file}';
+    protected $signature = 'importer:import {config : The JSON configuration file}';
 
     /**
      * Create a new command instance.

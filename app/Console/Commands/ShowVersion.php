@@ -42,7 +42,7 @@ class ShowVersion extends Command
      *
      * @var string
      */
-    protected $signature = 'spectre:version';
+    protected $signature = 'importer:version';
 
     /**
      * Create a new command instance.
