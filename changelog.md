@@ -2,6 +2,13 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.0.0 - 2020-10-21
+
+### Changed
+- Requires Firefly III 5.4.3
+- Commands now start with `importer` instead of `spectre`.
+- Docker image has an update.
+
 ## [1.0.5] - 2020-08-14
 
 ### Added
