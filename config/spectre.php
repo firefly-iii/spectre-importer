@@ -23,24 +23,25 @@
 declare(strict_types=1);
 
 $fireflyIIIURI = env('FIREFLY_III_URI');
-if('/' === substr($fireflyIIIURI, -1)) {
+if ('/' === substr($fireflyIIIURI, -1)) {
     $fireflyIIIURI = rtrim($fireflyIIIURI, '/');
 }
 
 return [
-    'version'         => '2.0.0',
-    'access_token'    => env('FIREFLY_III_ACCESS_TOKEN'),
-    'uri'             => $fireflyIIIURI,
-    'vanity_uri'      => envNonEmpty('VANITY_URI'),
-    'upload_path'     => storage_path('uploads'),
-    'minimum_version' => '5.4.3',
-    'spectre_app_id'  => env('SPECTRE_APP_ID', ''),
-    'spectre_secret'  => env('SPECTRE_SECRET', ''),
-    'spectre_uri'     => 'https://www.saltedge.com/api/v5',
-    'skip_key_step'   => false,
-    'trusted_proxies' => env('TRUSTED_PROXIES', ''),
-    'connection' => [
+    'version'             => '2.0.0',
+    'access_token'        => env('FIREFLY_III_ACCESS_TOKEN'),
+    'uri'                 => $fireflyIIIURI,
+    'vanity_uri'          => envNonEmpty('VANITY_URI'),
+    'upload_path'         => storage_path('uploads'),
+    'customer_identifier' => env('CUSTOMER_IDENTIFIER', 'default_ff3_customer'),
+    'minimum_version'     => '5.4.3',
+    'spectre_app_id'      => env('SPECTRE_APP_ID', ''),
+    'spectre_secret'      => env('SPECTRE_SECRET', ''),
+    'spectre_uri'         => 'https://www.saltedge.com/api/v5',
+    'skip_key_step'       => false,
+    'trusted_proxies'     => env('TRUSTED_PROXIES', ''),
+    'connection'          => [
         'verify'  => env('VERIFY_TLS_SECURITY', true),
-        'timeout' => (float) env('CONNECTION_TIMEOUT', 3.14),
+        'timeout' => (float)env('CONNECTION_TIMEOUT', 3.14),
     ],
 ];

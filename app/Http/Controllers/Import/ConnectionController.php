@@ -35,7 +35,6 @@ use App\Services\Spectre\Request\ListConnectionsRequest;
 use App\Services\Spectre\Request\ListCustomersRequest;
 use App\Services\Spectre\Request\PostConnectSessionsRequest;
 use App\Services\Spectre\Request\PostCustomerRequest;
-use App\Services\Spectre\Request\PutRefreshConnectionRequest;
 use App\Services\Spectre\Response\ErrorResponse;
 use App\Services\Spectre\Response\PostConnectSessionResponse;
 use App\Services\Spectre\Response\PostCustomerResponse;
@@ -81,7 +80,7 @@ class ConnectionController extends Controller
         }
         /** @var Customer $item */
         foreach ($list as $item) {
-            if ('default_ff3_customer' === $item->identifier) {
+            if (config('spectre.customer_identifier', 'default_ff3_customer') === $item->identifier) {
                 $hasCustomer = true;
                 $identifier  = $item->id;
             }
@@ -90,7 +89,7 @@ class ConnectionController extends Controller
         if (false === $hasCustomer) {
             // create new one
             $request             = new PostCustomerRequest($uri, $appId, $secret);
-            $request->identifier = 'default_ff3_customer';
+            $request->identifier = config('spectre.customer_identifier', 'default_ff3_customer');
             /** @var PostCustomerResponse $customer */
             $customer   = $request->post();
             $identifier = $customer->customer->id;
@@ -117,7 +116,7 @@ class ConnectionController extends Controller
 
         Log::debug('About to get connections.');
         $request           = new ListConnectionsRequest($uri, $appId, $secret);
-        $request->customer = (string) $identifier;
+        $request->customer = (string)$identifier;
         $list              = $request->get();
 
         if ($list instanceof ErrorResponse) {
@@ -149,7 +148,8 @@ class ConnectionController extends Controller
             $newToken->customer = $configuration->getIdentifier();
             $newToken->uri      = route('import.callback.index');
             /** @var PostConnectSessionResponse $result */
-            $result             = $newToken->post();
+            $result = $newToken->post();
+
             return redirect($result->connect_url);
         }
 
