@@ -46,69 +46,36 @@ abstract class Request
     /** @var int */
     protected $expiresAt = 0;
     /** @var string */
+    private $appId;
+    /** @var string */
     private $base;
     /** @var array */
     private $body;
     /** @var array */
     private $parameters;
     /** @var string */
+    private $secret;
+    private float $timeOut = 3.14;
+    /** @var string */
     private $uri;
 
-    /** @var string */
-    private $appId;
-    /** @var string */
-    private $secret;
-
-    private float $timeOut = 3.14;
+    /**
+     * @return Response
+     * @throws SpectreHttpException
+     */
+    abstract public function get(): Response;
 
     /**
-     * @return string
+     * @return Response
+     * @throws SpectreHttpException
      */
-    public function getAppId(): string
-    {
-        return $this->appId;
-    }
+    abstract public function post(): Response;
 
     /**
-     * @param float $timeOut
+     * @return Response
+     * @throws SpectreHttpException
      */
-    public function setTimeOut(float $timeOut): void
-    {
-        $this->timeOut = $timeOut;
-    }
-
-    /**
-     * @param string $appId
-     */
-    public function setAppId(string $appId): void
-    {
-        $this->appId = $appId;
-    }
-
-    /**
-     * @return string
-     */
-    public function getSecret(): string
-    {
-        return $this->secret;
-    }
-
-    /**
-     * @param string $secret
-     */
-    public function setSecret(string $secret): void
-    {
-        $this->secret = $secret;
-    }
-
-
-    /**
-     * @param string $base
-     */
-    public function setBase(string $base): void
-    {
-        $this->base = $base;
-    }
+    abstract public function put(): Response;
 
     /**
      * @param array $body
@@ -128,39 +95,17 @@ abstract class Request
     }
 
     /**
-     * @param string $uri
+     * @param float $timeOut
      */
-    public function setUri(string $uri): void
+    public function setTimeOut(float $timeOut): void
     {
-        $this->uri = $uri;
+        $this->timeOut = $timeOut;
     }
 
     /**
-     * @return string
-     */
-    public function getBase(): string
-    {
-        return $this->base;
-    }
-
-    /**
-     * @return string
-     */
-    public function getUri(): string
-    {
-        return $this->uri;
-    }
-
-    /**
-     * @throws SpectreHttpException
-     * @return Response
-     */
-    abstract public function get(): Response;
-
-    /**
-     * @throws SpectreErrorException
-     * @throws SpectreHttpException
      * @return array
+     * @throws SpectreHttpException
+     * @throws SpectreErrorException
      */
     protected function authenticatedGet(): array
     {
@@ -190,7 +135,7 @@ abstract class Request
             if (!$e->hasResponse()) {
                 throw new SpectreHttpException(sprintf('Exception: %s', $e->getMessage()));
             }
-            $body = (string) $e->getResponse()->getBody();
+            $body = (string)$e->getResponse()->getBody();
             $json = [];
             try {
                 $json = json_decode($body, true, 512, JSON_THROW_ON_ERROR);
@@ -206,9 +151,9 @@ abstract class Request
             // return body, class must handle this
             Log::error(sprintf('Status code is %d', $res->getStatusCode()));
 
-            $body = (string) $res->getBody();
+            $body = (string)$res->getBody();
         }
-        $body = $body ?? (string) $res->getBody();
+        $body = $body ?? (string)$res->getBody();
 
         try {
             $json = json_decode($body, true, 512, JSON_THROW_ON_ERROR);
@@ -232,11 +177,89 @@ abstract class Request
     }
 
     /**
+     * @return string
+     */
+    public function getBase(): string
+    {
+        return $this->base;
+    }
+
+    /**
+     * @param string $base
+     */
+    public function setBase(string $base): void
+    {
+        $this->base = $base;
+    }
+
+    /**
+     * @return string
+     */
+    public function getUri(): string
+    {
+        return $this->uri;
+    }
+
+    /**
+     * @param string $uri
+     */
+    public function setUri(string $uri): void
+    {
+        $this->uri = $uri;
+    }
+
+    /**
+     * @return Client
+     */
+    private function getClient(): Client
+    {
+        // config here
+
+        return new Client(
+            [
+                'connect_timeout' => $this->timeOut,
+            ]
+        );
+    }
+
+    /**
+     * @return string
+     */
+    public function getAppId(): string
+    {
+        return $this->appId;
+    }
+
+    /**
+     * @param string $appId
+     */
+    public function setAppId(string $appId): void
+    {
+        $this->appId = $appId;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSecret(): string
+    {
+        return $this->secret;
+    }
+
+    /**
+     * @param string $secret
+     */
+    public function setSecret(string $secret): void
+    {
+        $this->secret = $secret;
+    }
+
+    /**
      * @param array $data
      *
-     * @throws ImportException
      * @return array
      *
+     * @throws ImportException
      */
     protected function sendSignedSpectrePost(array $data): array
     {
@@ -282,11 +305,30 @@ abstract class Request
     }
 
     /**
-     * @param array  $data
+     * @return array
+     */
+    protected function getDefaultHeaders(): array
+    {
+        $userAgent       = sprintf('FireflyIII Spectre v%s', config('spectre.version'));
+        $this->expiresAt = time() + 180;
+
+        return [
+            'App-id'        => $this->getAppId(),
+            'Secret'        => $this->getSecret(),
+            'Accept'        => 'application/json',
+            'Content-type'  => 'application/json',
+            'Cache-Control' => 'no-cache',
+            'User-Agent'    => $userAgent,
+            'Expires-at'    => $this->expiresAt,
+        ];
+    }
+
+    /**
+     * @param array $data
      *
-     * @throws ImportException
      * @return array
      *
+     * @throws ImportException
      */
     protected function sendUnsignedSpectrePost(array $data): array
     {
@@ -302,7 +344,7 @@ abstract class Request
         } catch (JsonException $e) {
             Log::error($e->getMessage());
         }
-        if ('{}' !== (string) $body) {
+        if ('{}' !== (string)$body) {
             $opts['body'] = $body;
         }
 
@@ -340,9 +382,9 @@ abstract class Request
     /**
      * @param array $data
      *
-     * @throws ImportException
      * @return array
      *
+     * @throws ImportException
      */
     protected function sendUnsignedSpectrePut(array $data): array
     {
@@ -359,7 +401,7 @@ abstract class Request
         } catch (JsonException $e) {
             Log::error($e->getMessage());
         }
-        if ('{}' !== (string) $body) {
+        if ('{}' !== (string)$body) {
             $opts['body'] = $body;
         }
         //Log::debug('Final body + headers for spectre UNsigned PUT request:', $opts);
@@ -373,7 +415,7 @@ abstract class Request
                 // ignore it, just log it.
                 $statusCode                 = $response->getStatusCode();
                 $responseHeaders            = $response->getHeaders();
-                $json                       = json_decode((string) $e->getResponse()->getBody(), true, 512, JSON_THROW_ON_ERROR);
+                $json                       = json_decode((string)$e->getResponse()->getBody(), true, 512, JSON_THROW_ON_ERROR);
                 $json['ResponseHeaders']    = $responseHeaders;
                 $json['ResponseStatusCode'] = $statusCode;
 
@@ -404,50 +446,5 @@ abstract class Request
         $json['ResponseStatusCode'] = $statusCode;
 
         return $json;
-    }
-
-    /**
-     * @throws SpectreHttpException
-     * @return Response
-     */
-    abstract public function put(): Response;
-
-    /**
-     * @throws SpectreHttpException
-     * @return Response
-     */
-    abstract public function post(): Response;
-
-    /**
-     * @return Client
-     */
-    private function getClient(): Client
-    {
-        // config here
-
-        return new Client(
-            [
-                'connect_timeout' => $this->timeOut,
-            ]
-        );
-    }
-
-    /**
-     * @return array
-     */
-    protected function getDefaultHeaders(): array
-    {
-        $userAgent       = sprintf('FireflyIII Spectre v%s', config('spectre.version'));
-        $this->expiresAt = time() + 180;
-
-        return [
-            'App-id'        => $this->getAppId(),
-            'Secret'        => $this->getSecret(),
-            'Accept'        => 'application/json',
-            'Content-type'  => 'application/json',
-            'Cache-Control' => 'no-cache',
-            'User-Agent'    => $userAgent,
-            'Expires-at'    => $this->expiresAt,
-        ];
     }
 }

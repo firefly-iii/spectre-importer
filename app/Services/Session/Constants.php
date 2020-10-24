@@ -70,7 +70,7 @@ class Constants
     /** @var string */
     public const DOWNLOAD_JOB_IDENTIFIER = 'download_job_id';
 
-    /** @var string  */
+    /** @var string */
     public const SYNC_JOB_IDENTIFIER = 'sync_job_id';
 
     /** @var string */

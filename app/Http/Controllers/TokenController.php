@@ -84,6 +84,61 @@ class TokenController extends Controller
     }
 
     /**
+     * @return string|null
+     */
+    private function verifyFireflyIII(): ?string
+    {
+        // verify access
+        $uri     = (string)config('spectre.uri');
+        $token   = (string)config('spectre.access_token');
+        $request = new SystemInformationRequest($uri, $token);
+
+        $request->setVerify(config('spectre.connection.verify'));
+        $request->setTimeOut(config('spectre.connection.timeout'));
+
+        try {
+            $result = $request->get();
+        } catch (ApiHttpException $e) {
+            return $e->getMessage();
+        }
+        // -1 = OK (minimum is smaller)
+        // 0 = OK (same version)
+        // 1 = NOK (too low a version)
+
+        // verify version:
+        $minimum = (string)config('spectre.minimum_version');
+        $compare = version_compare($minimum, $result->version);
+        if (1 === $compare) {
+            return sprintf(
+                'Your Firefly III version %s is below the minimum required version %s',
+                $result->version, $minimum
+            );
+        }
+
+        return null;
+    }
+
+    /**
+     * @return string|null
+     */
+    private function verifySpectre(): ?string
+    {
+        $uri     = config('spectre.spectre_uri');
+        $appId   = config('spectre.spectre_app_id');
+        $secret  = config('spectre.spectre_secret');
+        $request = new ListCustomersRequest($uri, $appId, $secret);
+
+        $request->setTimeOut(config('spectre.connection.timeout'));
+
+        $response = $request->get();
+        if ($response instanceof ErrorResponse) {
+            return sprintf('%s: %s', $response->class, $response->message);
+        }
+
+        return null;
+    }
+
+    /**
      * Same thing but not over JSON.
      *
      * @return Factory|RedirectResponse|Redirector|View
@@ -106,61 +161,6 @@ class TokenController extends Controller
         }
 
         return redirect(route('index'));
-    }
-
-    /**
-     * @return string|null
-     */
-    private function verifyFireflyIII(): ?string
-    {
-        // verify access
-        $uri     = (string) config('spectre.uri');
-        $token   = (string) config('spectre.access_token');
-        $request = new SystemInformationRequest($uri, $token);
-
-        $request->setVerify(config('spectre.connection.verify'));
-        $request->setTimeOut(config('spectre.connection.timeout'));
-
-        try {
-            $result = $request->get();
-        } catch (ApiHttpException $e) {
-            return $e->getMessage();
-        }
-        // -1 = OK (minimum is smaller)
-        // 0 = OK (same version)
-        // 1 = NOK (too low a version)
-
-        // verify version:
-        $minimum = (string) config('spectre.minimum_version');
-        $compare = version_compare($minimum, $result->version);
-        if (1 === $compare) {
-            return sprintf(
-                'Your Firefly III version %s is below the minimum required version %s',
-                $result->version, $minimum
-            );
-        }
-
-        return null;
-    }
-
-    /**
-     * @return string|null
-     */
-    private function verifySpectre(): ?string
-    {
-        $uri      = config('spectre.spectre_uri');
-        $appId    = config('spectre.spectre_app_id');
-        $secret   = config('spectre.spectre_secret');
-        $request  = new ListCustomersRequest($uri, $appId, $secret);
-
-        $request->setTimeOut(config('spectre.connection.timeout'));
-
-        $response = $request->get();
-        if ($response instanceof ErrorResponse) {
-            return sprintf('%s: %s', $response->class, $response->message);
-        }
-
-        return null;
     }
 
 }

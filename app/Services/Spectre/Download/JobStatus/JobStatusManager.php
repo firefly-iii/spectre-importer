@@ -55,6 +55,17 @@ class JobStatusManager
     }
 
     /**
+     * @param string    $downloadIdentifier
+     * @param JobStatus $status
+     */
+    private static function storeJobStatus(string $downloadIdentifier, JobStatus $status): void
+    {
+        app('log')->debug(sprintf('Now in storeJobStatus(%s): %s', $downloadIdentifier, $status->status));
+        $disk = Storage::disk('jobs');
+        $disk->put($downloadIdentifier, json_encode($status->toArray(), JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT));
+    }
+
+    /**
      * @param string $downloadIdentifier
      * @param int    $index
      * @param string $message
@@ -140,16 +151,5 @@ class JobStatusManager
         app('log')->debug('Return download job status.', $status->toArray());
 
         return $status;
-    }
-
-    /**
-     * @param string    $downloadIdentifier
-     * @param JobStatus $status
-     */
-    private static function storeJobStatus(string $downloadIdentifier, JobStatus $status): void
-    {
-        app('log')->debug(sprintf('Now in storeJobStatus(%s): %s', $downloadIdentifier, $status->status));
-        $disk = Storage::disk('jobs');
-        $disk->put($downloadIdentifier, json_encode($status->toArray(), JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT));
     }
 }

@@ -54,6 +54,19 @@ class JobStatusManager
     }
 
     /**
+     * @param string    $syncIdentifier
+     * @param JobStatus $status
+     */
+    private static function storeJobStatus(string $syncIdentifier, JobStatus $status): void
+    {
+        app('log')->debug(sprintf('Now in Sync storeJobStatus(%s): %s', $syncIdentifier, $status->status));
+        $array = $status->toArray();
+        $disk  = Storage::disk('jobs');
+        $disk->put($syncIdentifier, json_encode($status->toArray(), JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT));
+        app('log')->debug('Done with storing.');
+    }
+
+    /**
      * @param string $identifier
      * @param int    $index
      * @param string $message
@@ -122,7 +135,8 @@ class JobStatusManager
         $disk = Storage::disk('jobs');
         try {
             if ($disk->exists($identifier)) {
-                $array  = json_decode($disk->get($identifier), true, 512, JSON_THROW_ON_ERROR);
+                $array = json_decode($disk->get($identifier), true, 512, JSON_THROW_ON_ERROR);
+
                 return JobStatus::fromArray($array);
             }
         } catch (FileNotFoundException $e) {
@@ -134,18 +148,5 @@ class JobStatusManager
         $disk->put($identifier, json_encode($status->toArray(), JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT));
 
         return $status;
-    }
-
-    /**
-     * @param string    $syncIdentifier
-     * @param JobStatus $status
-     */
-    private static function storeJobStatus(string $syncIdentifier, JobStatus $status): void
-    {
-        app('log')->debug(sprintf('Now in Sync storeJobStatus(%s): %s', $syncIdentifier, $status->status));
-        $array = $status->toArray();
-        $disk  = Storage::disk('jobs');
-        $disk->put($syncIdentifier, json_encode($status->toArray(), JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT));
-        app('log')->debug('Done with storing.');
     }
 }

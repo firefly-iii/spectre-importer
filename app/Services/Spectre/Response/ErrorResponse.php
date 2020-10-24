@@ -39,7 +39,7 @@ class ErrorResponse extends Response
      */
     public function __construct(array $data)
     {
-        $this->class = $data['error']['class'] ?? 'Unknown Spectre Error Class';
+        $this->class   = $data['error']['class'] ?? 'Unknown Spectre Error Class';
         $this->message = $data['error']['message'] ?? 'Unknown Error';
     }
 }

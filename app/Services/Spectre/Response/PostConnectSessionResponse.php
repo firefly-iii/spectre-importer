@@ -31,7 +31,7 @@ namespace App\Services\Spectre\Response;
 class PostConnectSessionResponse extends Response
 {
 
-    /** @var string  */
+    /** @var string */
     public string $connect_url;
 
     /**
@@ -39,6 +39,6 @@ class PostConnectSessionResponse extends Response
      */
     public function __construct(array $data)
     {
-        $this->connect_url = (string) $data['connect_url'];
+        $this->connect_url = (string)$data['connect_url'];
     }
 }

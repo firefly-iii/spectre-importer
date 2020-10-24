@@ -26,12 +26,43 @@ namespace App\Http\Controllers;
 
 
 use App\Services\Session\Constants;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Routing\Redirector;
 
 /**
  * Class NavController
  */
 class NavController extends Controller
 {
+    /**
+     * @return Application|RedirectResponse|Redirector
+     */
+    public function toConfig()
+    {
+        session()->forget(Constants::CONFIG_COMPLETE_INDICATOR);
+
+        return redirect(sprintf('%s?overruleskip=true', route('import.configure.index')));
+    }
+
+    /**
+     * @return Application|RedirectResponse|Redirector
+     */
+    public function toConnection()
+    {
+        session()->forget(Constants::CONNECTION_SELECTED_INDICATOR);
+
+        return redirect(route('import.connections.index'));
+    }
+
+    /**
+     * @return Application|RedirectResponse|Redirector
+     */
+    public function toMapping()
+    {
+        return redirect(route('import.mapping.index'));
+    }
+
     /**
      * Redirect to index. Requires no special steps or middleware.
      */
@@ -42,41 +73,13 @@ class NavController extends Controller
     }
 
     /**
-     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     * @return Application|RedirectResponse|Redirector
      */
     public function toUpload()
     {
         session()->forget(Constants::HAS_UPLOAD);
 
         return redirect(route('import.start'));
-    }
-
-    /**
-     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
-     */
-    public function toConnection()
-    {
-        session()->forget(Constants::CONNECTION_SELECTED_INDICATOR);
-
-        return redirect(route('import.connections.index'));
-    }
-
-    /**
-     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
-     */
-    public function toMapping()
-    {
-        return redirect(route('import.mapping.index'));
-    }
-
-    /**
-     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
-     */
-    public function toConfig()
-    {
-        session()->forget(Constants::CONFIG_COMPLETE_INDICATOR);
-
-        return redirect(sprintf('%s?overruleskip=true', route('import.configure.index')));
     }
 
 }

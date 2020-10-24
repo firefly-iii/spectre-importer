@@ -23,6 +23,7 @@
 declare(strict_types=1);
 
 namespace App\Http\Controllers;
+
 use Artisan;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\RedirectResponse;
@@ -46,16 +47,6 @@ class IndexController extends Controller
     }
 
     /**
-     * @return Factory|View
-     */
-    public function index()
-    {
-        Log::debug(sprintf('Now at %s', __METHOD__));
-
-        return view('index');
-    }
-
-    /**
      * @return RedirectResponse|Redirector
      */
     public function flush()
@@ -65,6 +56,16 @@ class IndexController extends Controller
         Artisan::call('cache:clear');
 
         return redirect(route('index'));
+    }
+
+    /**
+     * @return Factory|View
+     */
+    public function index()
+    {
+        Log::debug(sprintf('Now at %s', __METHOD__));
+
+        return view('index');
     }
 
 }

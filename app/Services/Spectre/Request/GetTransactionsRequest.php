@@ -36,6 +36,7 @@ class GetTransactionsRequest extends Request
 {
     public string $accountId;
     public string $connectionId;
+
     /**
      * GetTransactionsRequest constructor.
      *
@@ -57,8 +58,8 @@ class GetTransactionsRequest extends Request
      */
     public function get(): Response
     {
-        $hasNextPage = true;
-        $nextId      = 0;
+        $hasNextPage  = true;
+        $nextId       = 0;
         $transactions = [];
         while ($hasNextPage) {
             Log::debug(sprintf('Now calling GetTransactionsRequest for next_id %d', $nextId));
@@ -66,11 +67,11 @@ class GetTransactionsRequest extends Request
             $this->setParameters(
                 [
                     'connection_id' => $this->connectionId,
-                    'account_id' => $this->accountId,
-                    'from_id' =>$nextId,
+                    'account_id'    => $this->accountId,
+                    'from_id'       => $nextId,
                 ]
             );
-            $response   = $this->authenticatedGet();
+            $response = $this->authenticatedGet();
 
             // count entries:
             Log::debug(sprintf('Found %d entries in data-array', count($response['data'])));
@@ -88,15 +89,8 @@ class GetTransactionsRequest extends Request
                 $transactions[] = $transactionArray;
             }
         }
-        return new GetTransactionsResponse($transactions);
-    }
 
-    /**
-     * @inheritDoc
-     */
-    public function put(): Response
-    {
-        // TODO: Implement put() method.
+        return new GetTransactionsResponse($transactions);
     }
 
     /**
@@ -105,5 +99,13 @@ class GetTransactionsRequest extends Request
     public function post(): Response
     {
         // TODO: Implement post() method.
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function put(): Response
+    {
+        // TODO: Implement put() method.
     }
 }

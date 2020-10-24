@@ -79,16 +79,16 @@ class GetAccountsRequest extends Request
     /**
      * @inheritDoc
      */
-    public function put(): Response
+    public function post(): Response
     {
-        // TODO: Implement put() method.
+        // TODO: Implement post() method.
     }
 
     /**
      * @inheritDoc
      */
-    public function post(): Response
+    public function put(): Response
     {
-        // TODO: Implement post() method.
+        // TODO: Implement put() method.
     }
 }

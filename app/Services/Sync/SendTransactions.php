@@ -44,13 +44,12 @@ class SendTransactions
 {
     use ProgressInformation;
 
+    private bool   $addTag;
     /** @var Configuration */
     private $configuration;
-
-    private bool   $addTag;
+    private string $rootURI;
     private string $tag;
     private string $tagDate;
-    private string $rootURI;
 
     /**
      * @param array $transactions
@@ -65,13 +64,13 @@ class SendTransactions
         $this->createTag();
 
         $this->rootURI = config('spectre.uri');
-        if ('' !== (string) config('spectre.vanity_uri')) {
+        if ('' !== (string)config('spectre.vanity_uri')) {
             $this->rootURI = config('spectre.vanity_uri');
         }
         Log::debug(sprintf('The root URI is "%s"', $this->rootURI));
 
-        $uri   = (string) config('spectre.uri');
-        $token = (string) config('spectre.access_token');
+        $uri   = (string)config('spectre.uri');
+        $token = (string)config('spectre.access_token');
         foreach ($transactions as $index => $transaction) {
             app('log')->debug(sprintf('Trying to send transaction #%d', $index), $transaction);
             $group = $this->sendTransaction($uri, $token, $index, $transaction);
@@ -84,43 +83,6 @@ class SendTransactions
     }
 
     /**
-     * @param TransactionGroup $group
-     */
-    private function addTagToGroup(TransactionGroup $group): void
-    {
-        if (false === $this->addTag) {
-            Log::debug('Will not add import tag.');
-            return;
-        }
-
-        $groupId = (int) $group->id;
-        Log::debug(sprintf('Going to add import tag to transaction group #%d', $groupId));
-        $body = [
-            'transactions' => [],
-        ];
-        /** @var Transaction $transaction */
-        foreach ($group->transactions as $transaction) {
-            /** @var array $currentTags */
-            $currentTags = $transaction->tags;
-            $currentTags[] = $this->tag;
-
-            $body['transactions'][] = [
-                'transaction_journal_id' => $transaction->id,
-                'tags'                   => $currentTags,
-            ];
-        }
-        $uri     = (string) config('spectre.uri');
-        $token   = (string) config('spectre.access_token');
-        $request = new PutTransactionRequest($uri, $token, $groupId);
-        $request->setVerify(config('spectre.connection.verify'));
-        $request->setTimeOut(config('spectre.connection.timeout'));
-        $request->setBody($body);
-        $request->put();
-
-    }
-
-
-    /**
      *
      */
     private function createTag(): void
@@ -130,8 +92,8 @@ class SendTransactions
 
             return;
         }
-        $uri     = (string) config('spectre.uri');
-        $token   = (string) config('spectre.access_token');
+        $uri     = (string)config('spectre.uri');
+        $token   = (string)config('spectre.access_token');
         $request = new PostTagRequest($uri, $token);
         $request->setVerify(config('spectre.connection.verify'));
         $request->setTimeOut(config('spectre.connection.timeout'));
@@ -158,17 +120,6 @@ class SendTransactions
             Log::info(sprintf('Created tag #%d "%s"', $response->getTag()->id, $response->getTag()->tag));
         }
     }
-
-    /**
-     * @param Configuration $configuration
-     */
-    public function setConfiguration(Configuration $configuration): void
-    {
-        $this->addTag        = true;
-        $this->configuration = $configuration;
-        $this->addTag        = $configuration->isAddImportTag();
-    }
-
 
     /**
      * @param string $uri
@@ -214,7 +165,7 @@ class SendTransactions
             return null;
         }
         $groupId  = $group->id;
-        $groupUri = (string) sprintf('%s/transactions/show/%d', $this->rootURI, $groupId);
+        $groupUri = (string)sprintf('%s/transactions/show/%d', $this->rootURI, $groupId);
 
         /** @var Transaction $tr */
         foreach ($group->transactions as $tr) {
@@ -222,11 +173,58 @@ class SendTransactions
                 $index + 1,
                 sprintf(
                     'Created transaction #%d: <a href="%s">%s</a> (%s %s)', $groupId, $groupUri, $tr->description, $tr->currencyCode,
-                    round((float) $tr->amount, 2)
+                    round((float)$tr->amount, 2)
                 )
             );
         }
 
         return $group;
+    }
+
+    /**
+     * @param TransactionGroup $group
+     */
+    private function addTagToGroup(TransactionGroup $group): void
+    {
+        if (false === $this->addTag) {
+            Log::debug('Will not add import tag.');
+
+            return;
+        }
+
+        $groupId = (int)$group->id;
+        Log::debug(sprintf('Going to add import tag to transaction group #%d', $groupId));
+        $body = [
+            'transactions' => [],
+        ];
+        /** @var Transaction $transaction */
+        foreach ($group->transactions as $transaction) {
+            /** @var array $currentTags */
+            $currentTags   = $transaction->tags;
+            $currentTags[] = $this->tag;
+
+            $body['transactions'][] = [
+                'transaction_journal_id' => $transaction->id,
+                'tags'                   => $currentTags,
+            ];
+        }
+        $uri     = (string)config('spectre.uri');
+        $token   = (string)config('spectre.access_token');
+        $request = new PutTransactionRequest($uri, $token, $groupId);
+        $request->setVerify(config('spectre.connection.verify'));
+        $request->setTimeOut(config('spectre.connection.timeout'));
+        $request->setBody($body);
+        $request->put();
+
+    }
+
+    /**
+     * @param Configuration $configuration
+     */
+    public function setConfiguration(Configuration $configuration): void
+    {
+        $this->addTag        = true;
+        $this->configuration = $configuration;
+        $this->addTag        = $configuration->isAddImportTag();
     }
 }

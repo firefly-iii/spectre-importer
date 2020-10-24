@@ -52,20 +52,13 @@ class PostConnectSessionsRequest extends Request
         $this->setSecret($secret);
         $this->setUri('connect_sessions/create');
     }
+
     /**
      * @inheritDoc
      */
     public function get(): Response
     {
         // TODO: Implement get() method.
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function put(): Response
-    {
-        // TODO: Implement put() method.
     }
 
     /**
@@ -93,5 +86,13 @@ class PostConnectSessionsRequest extends Request
         $response = $this->sendUnsignedSpectrePost($body);
 
         return new PostConnectSessionResponse($response['data']);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function put(): Response
+    {
+        // TODO: Implement put() method.
     }
 }

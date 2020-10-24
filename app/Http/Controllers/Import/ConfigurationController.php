@@ -33,6 +33,7 @@ use App\Services\Spectre\Model\Account;
 use App\Services\Spectre\Request\GetAccountsRequest as SpectreGetAccountsRequest;
 use GrumpyDictator\FFIIIApiSupport\Request\GetAccountsRequest;
 use Illuminate\Contracts\Routing\ResponseFactory;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use JsonException;
@@ -45,9 +46,37 @@ class ConfigurationController extends Controller
 {
 
     /**
+     * @return ResponseFactory|Response
+     */
+    public function download()
+    {
+        // do something
+        $result = '';
+        $config = Configuration::fromArray(session()->get(Constants::CONFIGURATION))->toArray();
+        try {
+            $result = json_encode($config, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT, 512);
+        } catch (JsonException $e) {
+            Log::error($e->getMessage());
+        }
+
+        $response = response($result);
+        $name     = sprintf('spectre_import_config_%s.json', date('Y-m-d'));
+        $response->header('Content-disposition', 'attachment; filename=' . $name)
+                 ->header('Content-Type', 'application/json')
+                 ->header('Content-Description', 'File Transfer')
+                 ->header('Connection', 'Keep-Alive')
+                 ->header('Expires', '0')
+                 ->header('Cache-Control', 'must-revalidate, post-check=0, pre-check=0')
+                 ->header('Pragma', 'public')
+                 ->header('Content-Length', strlen($result));
+
+        return $response;
+    }
+
+    /**
      * @param Request $request
      *
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
     public function index(Request $request)
     {
@@ -68,8 +97,8 @@ class ConfigurationController extends Controller
         }
 
         // get list of asset accounts in Firefly III
-        $uri         = (string) config('spectre.uri');
-        $token       = (string) config('spectre.access_token');
+        $uri         = (string)config('spectre.uri');
+        $token       = (string)config('spectre.access_token');
         $accountList = new GetAccountsRequest($uri, $token);
 
         $accountList->setVerify(config('spectre.connection.verify'));
@@ -141,7 +170,7 @@ class ConfigurationController extends Controller
         $accounts = [];
         foreach (array_keys($fromRequest['do_import']) as $accountId) {
             if (isset($fromRequest['accounts'][$accountId])) {
-                $accounts[$accountId] = (int) $fromRequest['accounts'][$accountId];
+                $accounts[$accountId] = (int)$fromRequest['accounts'][$accountId];
             }
         }
         $configuration->setAccounts($accounts);
@@ -154,33 +183,5 @@ class ConfigurationController extends Controller
 
         // redirect to import things?
         return redirect()->route('import.download.index');
-    }
-
-    /**
-     * @return ResponseFactory|Response
-     */
-    public function download()
-    {
-        // do something
-        $result = '';
-        $config = Configuration::fromArray(session()->get(Constants::CONFIGURATION))->toArray();
-        try {
-            $result = json_encode($config, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT, 512);
-        } catch (JsonException $e) {
-            Log::error($e->getMessage());
-        }
-
-        $response = response($result);
-        $name     = sprintf('spectre_import_config_%s.json', date('Y-m-d'));
-        $response->header('Content-disposition', 'attachment; filename=' . $name)
-                 ->header('Content-Type', 'application/json')
-                 ->header('Content-Description', 'File Transfer')
-                 ->header('Connection', 'Keep-Alive')
-                 ->header('Expires', '0')
-                 ->header('Cache-Control', 'must-revalidate, post-check=0, pre-check=0')
-                 ->header('Pragma', 'public')
-                 ->header('Content-Length', strlen($result));
-
-        return $response;
     }
 }

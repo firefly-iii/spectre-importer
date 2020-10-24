@@ -55,6 +55,21 @@ use UnexpectedValueException;
 class StorageService
 {
     /**
+     * @param string $name
+     *
+     * @return string
+     * @throws FileNotFoundException
+     */
+    public static function getContent(string $name): string
+    {
+        $disk = Storage::disk('uploads');
+        if ($disk->exists($name)) {
+            return $disk->get($name);
+        }
+        throw new UnexpectedValueException(sprintf('No such file %s', $name));
+    }
+
+    /**
      * @param string $content
      *
      * @return string
@@ -66,21 +81,6 @@ class StorageService
         $disk->put($fileName, $content);
 
         return $fileName;
-    }
-
-    /**
-     * @param string $name
-     *
-     * @throws FileNotFoundException
-     * @return string
-     */
-    public static function getContent(string $name): string
-    {
-        $disk = Storage::disk('uploads');
-        if ($disk->exists($name)) {
-            return $disk->get($name);
-        }
-        throw new UnexpectedValueException(sprintf('No such file %s', $name));
     }
 
 }
