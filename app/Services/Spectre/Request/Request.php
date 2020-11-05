@@ -54,7 +54,7 @@ abstract class Request
     /** @var array */
     private $parameters;
     /** @var string */
-    private $secret;
+    private       $secret;
     private float $timeOut = 3.14;
     /** @var string */
     private $uri;
@@ -422,7 +422,9 @@ abstract class Request
                 return $json;
             }
             Log::error($e->getMessage());
-            Log::error((string)$e->getResponse()->getBody());
+            if (null !== $response) {
+                Log::error((string)$e->getResponse()->getBody());
+            }
             throw new ImportException(sprintf('Request Exception: %s', $e->getMessage()));
         }
 
