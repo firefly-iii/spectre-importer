@@ -8,6 +8,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 - [Issue 3796](https://github.com/firefly-iii/firefly-iii/issues/3796) You can now set a custom Spectre identifier.
 
+### Fixed
+
+- [Issue 4033](https://github.com/firefly-iii/firefly-iii/issues/4033) Better error handlign when running into DNS timeouts.
+
 ## 2.0.0 - 2020-10-21
 
 ### Changed
