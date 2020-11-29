@@ -89,6 +89,10 @@ return [
             'url'        => env('APP_URL') . '/storage',
             'visibility' => 'public',
         ],
+        'configurations' => [
+            'driver' => 'local',
+            'root'   => envNonEmpty('JSON_CONFIGURATION_DIR', storage_path('configurations')),
+        ],
 
         's3' => [
             'driver'   => 's3',
