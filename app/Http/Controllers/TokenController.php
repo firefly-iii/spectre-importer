@@ -89,9 +89,9 @@ class TokenController extends Controller
     private function verifyFireflyIII(): ?string
     {
         // verify access
-        $uri     = (string)config('spectre.uri');
+        $url     = (string)config('spectre.url');
         $token   = (string)config('spectre.access_token');
-        $request = new SystemInformationRequest($uri, $token);
+        $request = new SystemInformationRequest($url, $token);
 
         $request->setVerify(config('spectre.connection.verify'));
         $request->setTimeOut(config('spectre.connection.timeout'));
@@ -123,10 +123,10 @@ class TokenController extends Controller
      */
     private function verifySpectre(): ?string
     {
-        $uri     = config('spectre.spectre_uri');
+        $url     = config('spectre.spectre_url');
         $appId   = config('spectre.spectre_app_id');
         $secret  = config('spectre.spectre_secret');
-        $request = new ListCustomersRequest($uri, $appId, $secret);
+        $request = new ListCustomersRequest($url, $appId, $secret);
 
         $request->setTimeOut(config('spectre.connection.timeout'));
 

@@ -57,7 +57,7 @@ abstract class Request
     private       $secret;
     private float $timeOut = 3.14;
     /** @var string */
-    private $uri;
+    private $url;
 
     /**
      * @return Response
@@ -109,10 +109,10 @@ abstract class Request
      */
     protected function authenticatedGet(): array
     {
-        $fullUri = sprintf('%s/%s', $this->getBase(), $this->getUri());
+        $fullUrl = sprintf('%s/%s', $this->getBase(), $this->getUrl());
 
         if (null !== $this->parameters) {
-            $fullUri = sprintf('%s?%s', $fullUri, http_build_query($this->parameters));
+            $fullUrl = sprintf('%s?%s', $fullUrl, http_build_query($this->parameters));
         }
         $client = $this->getClient();
         $res    = null;
@@ -120,7 +120,7 @@ abstract class Request
         $json   = null;
         try {
             $res = $client->request(
-                'GET', $fullUri, [
+                'GET', $fullUrl, [
                          'headers' => [
                              'Accept'       => 'application/json',
                              'Content-Type' => 'application/json',
@@ -161,7 +161,7 @@ abstract class Request
             throw new SpectreHttpException(
                 sprintf(
                     'Could not decode JSON (%s). Error[%d] is: %s. Response: %s',
-                    $fullUri,
+                    $fullUrl,
                     $res ? $res->getStatusCode() : 0,
                     $e->getMessage(),
                     $body
@@ -195,17 +195,17 @@ abstract class Request
     /**
      * @return string
      */
-    public function getUri(): string
+    public function getUrl(): string
     {
-        return $this->uri;
+        return $this->url;
     }
 
     /**
-     * @param string $uri
+     * @param string $url
      */
-    public function setUri(string $uri): void
+    public function setUrl(string $url): void
     {
-        $this->uri = $uri;
+        $this->url = $url;
     }
 
     /**
@@ -263,10 +263,10 @@ abstract class Request
      */
     protected function sendSignedSpectrePost(array $data): array
     {
-        if ('' === $this->uri) {
+        if ('' === $this->url) {
             throw new ImportException('No Spectre server defined');
         }
-        $fullUri = sprintf('%s/%s', $this->getBase(), $this->getUri());
+        $fullUrl = sprintf('%s/%s', $this->getBase(), $this->getUrl());
         $headers = $this->getDefaultHeaders();
         try {
             $body = json_encode($data, JSON_THROW_ON_ERROR);
@@ -277,7 +277,7 @@ abstract class Request
         Log::debug('Final headers for spectre signed POST request:', $headers);
         try {
             $client = $this->getClient();
-            $res    = $client->request('POST', $fullUri, ['headers' => $headers, 'body' => $body]);
+            $res    = $client->request('POST', $fullUrl, ['headers' => $headers, 'body' => $body]);
         } catch (GuzzleException|Exception $e) {
             throw new ImportException(sprintf('Guzzle Exception: %s', $e->getMessage()));
         }
@@ -332,10 +332,10 @@ abstract class Request
      */
     protected function sendUnsignedSpectrePost(array $data): array
     {
-        if ('' === $this->uri) {
+        if ('' === $this->url) {
             throw new ImportException('No Spectre server defined');
         }
-        $fullUri = sprintf('%s/%s', $this->getBase(), $this->getUri());
+        $fullUrl = sprintf('%s/%s', $this->getBase(), $this->getUrl());
         $headers = $this->getDefaultHeaders();
         $opts    = ['headers' => $headers];
         $body    = null;
@@ -351,7 +351,7 @@ abstract class Request
         Log::debug('Final headers for spectre UNsigned POST request:', $headers);
         try {
             $client = $this->getClient();
-            $res    = $client->request('POST', $fullUri, $opts);
+            $res    = $client->request('POST', $fullUrl, $opts);
         } catch (GuzzleException|Exception $e) {
             Log::error($e->getMessage());
             throw new ImportException(sprintf('Guzzle Exception: %s', $e->getMessage()));
@@ -388,10 +388,10 @@ abstract class Request
      */
     protected function sendUnsignedSpectrePut(array $data): array
     {
-        if ('' === $this->uri) {
+        if ('' === $this->url) {
             throw new ImportException('No Spectre server defined');
         }
-        $fullUri = sprintf('%s/%s', $this->getBase(), $this->getUri());
+        $fullUrl = sprintf('%s/%s', $this->getBase(), $this->getUrl());
         $headers = $this->getDefaultHeaders();
         $opts    = ['headers' => $headers];
         $body    = null;
@@ -407,7 +407,7 @@ abstract class Request
         //Log::debug('Final body + headers for spectre UNsigned PUT request:', $opts);
         try {
             $client = $this->getClient();
-            $res    = $client->request('PUT', $fullUri, $opts);
+            $res    = $client->request('PUT', $fullUrl, $opts);
         } catch (RequestException|GuzzleException $e) {
             // get response.
             $response = $e->getResponse();

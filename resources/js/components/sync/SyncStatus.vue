@@ -27,14 +27,14 @@
                 <div class="card-body" v-if="'waiting_to_start' === this.status && false === this.triedToStart">
                     <p>
                         The tool is ready to import your data into Firefly III. Press "start job" to start.
-                        <a :href="this.downloadUri" title="Download configuration file.">
+                        <a :href="this.downloadUrl" title="Download configuration file.">
                             You can download a configuration file of your import</a>, so you can make a
                         quick start the next time you import.
                     </p>
                     <div class="row">
                         <div class="col-lg-6">
                             <!-- go back to upload -->
-                            <a :href="this.jobBackUri" class="btn btn-secondary">&larr; Go back</a>
+                            <a :href="this.jobBackUrl" class="btn btn-secondary">&larr; Go back</a>
                         </div>
                         <div class="col-lg-6">
                             <button
@@ -65,8 +65,8 @@
                 </div>
                 <div class="card-body" v-if="'job_done' === this.status ">
                     <p>
-                        The import routine has finished 🎉. You can <a :href="this.flushUri" class="btn btn-success btn-sm">start a new import</a>,
-                        <a class="btn btn-info btn-sm" :href="this.downloadUri" title="Download configuration file.">download the import configuration</a>
+                        The import routine has finished 🎉. You can <a :href="this.flushUrl" class="btn btn-success btn-sm">start a new import</a>,
+                        <a class="btn btn-info btn-sm" :href="this.downloadUrl" title="Download configuration file.">download the import configuration</a>
                         or inspect the results of the import further below:
                     </p>
                     <sync-messages
@@ -106,20 +106,20 @@
                 messages: [],
                 warnings: [],
                 errors: [],
-                downloadUri: window.configDownloadUri,
-                jobBackUri:window.jobBackUri,
-                flushUri: window.flushUri
+                downloadUrl: window.configDownloadUrl,
+                jobBackUrl:window.jobBackUrl,
+                flushUrl: window.flushUrl
             };
         },
         props: [],
         mounted() {
-            console.log(`Mounted, check job at ${syncStatusUri}.`);
+            console.log(`Mounted, check job at ${syncStatusUrl}.`);
             this.getJobStatus();
         },
         methods: {
             getJobStatus: function () {
                 console.log('getSyncStatus');
-                axios.get(syncStatusUri).then((response) => {
+                axios.get(syncStatusUrl).then((response) => {
                     // handle success
                     this.status = response.data.status;
                     this.errors = response.data.errors;
@@ -151,8 +151,8 @@
                 });
             },
             callStart: function () {
-                console.log('Call sync job start URI: ' + syncStartUri);
-                axios.post(syncStartUri).then((response) => {
+                console.log('Call sync job start URL: ' + syncStartUrl);
+                axios.post(syncStartUrl).then((response) => {
                     this.getJobStatus();
                 }).catch((error) => {
                     this.status = 'error';

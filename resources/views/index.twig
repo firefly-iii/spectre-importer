@@ -36,18 +36,18 @@
 {% block scripts %}
 
     <script type="text/javascript">
-        var uri = '{{ route('token.validate') }}';
-        var tokenPageUri = '{{ route('token.index') }}';
-        $.getJSON(uri).done(function (data) {
+        var url = '{{ route('token.validate') }}';
+        var tokenPageUrl = '{{ route('token.index') }}';
+        $.getJSON(url).done(function (data) {
             if ('OK' === data.result) {
                 $('#start').removeClass('disabled').html('Start here &rarr;');
             } else {
                 $('#start').hide();
-                window.location = tokenPageUri;
+                window.location = tokenPageUrl;
             }
         }).fail(function() {
             $('#start').hide();
-            window.location = tokenPageUri;
+            window.location = tokenPageUrl;
         });
     </script>
 {% endblock %}

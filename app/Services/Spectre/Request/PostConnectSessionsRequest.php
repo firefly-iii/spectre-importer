@@ -36,7 +36,7 @@ class PostConnectSessionsRequest extends Request
     public string $customer;
 
     /** @var string */
-    public string $uri;
+    public string $url;
 
     /**
      * PostConnectSessionsRequest constructor.
@@ -50,7 +50,7 @@ class PostConnectSessionsRequest extends Request
         $this->setBase($url);
         $this->setAppId($appId);
         $this->setSecret($secret);
-        $this->setUri('connect_sessions/create');
+        $this->setUrl('connect_sessions/create');
     }
 
     /**
@@ -77,7 +77,7 @@ class PostConnectSessionsRequest extends Request
                     'credentials_strategy'      => 'ask',
                 ],
                 'attempt'     => [
-                    'return_to' => $this->uri,
+                    'return_to' => $this->url,
                 ],
 
             ],

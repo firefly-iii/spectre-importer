@@ -65,13 +65,13 @@ class ConnectionController extends Controller
     {
         $mainTitle = 'Spectre';
         $subTitle  = 'Select your financial organisation';
-        $uri       = config('spectre.spectre_uri');
+        $url       = config('spectre.spectre_url');
         $appId     = config('spectre.spectre_app_id');
         $secret    = config('spectre.spectre_secret');
 
         // check if already has the correct customer:
         $hasCustomer = false;
-        $request     = new ListCustomersRequest($uri, $appId, $secret);
+        $request     = new ListCustomersRequest($url, $appId, $secret);
         $list        = $request->get();
         $identifier  = null;
 
@@ -88,7 +88,7 @@ class ConnectionController extends Controller
 
         if (false === $hasCustomer) {
             // create new one
-            $request             = new PostCustomerRequest($uri, $appId, $secret);
+            $request             = new PostCustomerRequest($url, $appId, $secret);
             $request->identifier = config('spectre.customer_identifier', 'default_ff3_customer');
             /** @var PostCustomerResponse $customer */
             $customer   = $request->post();
@@ -115,7 +115,7 @@ class ConnectionController extends Controller
         session()->put(Constants::CONFIGURATION, $configuration->toArray());
 
         Log::debug('About to get connections.');
-        $request           = new ListConnectionsRequest($uri, $appId, $secret);
+        $request           = new ListConnectionsRequest($url, $appId, $secret);
         $request->customer = (string)$identifier;
         $list              = $request->get();
 
@@ -141,12 +141,12 @@ class ConnectionController extends Controller
             }
 
             // make a new connection.
-            $uri                = config('spectre.spectre_uri');
+            $url                = config('spectre.spectre_url');
             $appId              = config('spectre.spectre_app_id');
             $secret             = config('spectre.spectre_secret');
-            $newToken           = new PostConnectSessionsRequest($uri, $appId, $secret);
+            $newToken           = new PostConnectSessionsRequest($url, $appId, $secret);
             $newToken->customer = $configuration->getIdentifier();
-            $newToken->uri      = route('import.callback.index');
+            $newToken->url      = route('import.callback.index');
             /** @var PostConnectSessionResponse $result */
             $result = $newToken->post();
 

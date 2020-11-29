@@ -50,7 +50,7 @@ class GetTransactionsRequest extends Request
         $this->setBase($url);
         $this->setAppId($appId);
         $this->setSecret($secret);
-        $this->setUri('transactions');
+        $this->setUrl('transactions');
     }
 
     /**

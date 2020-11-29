@@ -71,11 +71,11 @@ class SyncController extends Controller
         $configuration = Configuration::fromArray(session()->get(Constants::CONFIGURATION));
         if (true === $configuration->emptyMapping()) {
             // no mapping, back to roles
-            $jobBackUri = route('back.config');
+            $jobBackUrl = route('back.config');
         }
         if (false === $configuration->emptyMapping()) {
             // back to mapping
-            $jobBackUri = route('back.mapping');
+            $jobBackUrl = route('back.mapping');
         }
 
         if (null === $syncIdentifier) {
@@ -93,7 +93,7 @@ class SyncController extends Controller
         session()->put(Constants::SYNC_JOB_IDENTIFIER, $syncIdentifier);
         app('log')->debug(sprintf('Stored "%s" under "%s"', $syncIdentifier, Constants::SYNC_JOB_IDENTIFIER));
 
-        return view('import.sync.index', compact('mainTitle', 'jobBackUri', 'subTitle', 'syncIdentifier', 'downloadIdentifier'));
+        return view('import.sync.index', compact('mainTitle', 'jobBackUrl', 'subTitle', 'syncIdentifier', 'downloadIdentifier'));
     }
 
     /**

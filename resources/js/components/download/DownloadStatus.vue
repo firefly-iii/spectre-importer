@@ -87,20 +87,20 @@
                 messages: [],
                 warnings: [],
                 errors: [],
-                downloadUri: window.configDownloadUri,
-                flushUri: window.flushUri
+                downloadUrl: window.configDownloadUrl,
+                flushUrl: window.flushUrl
             };
         },
         props: [],
         mounted() {
-            console.log(`Mounted, check job at ${downloadStatusUri}.`);
+            console.log(`Mounted, check job at ${downloadStatusUrl}.`);
             this.getJobStatus();
             this.callStart();
         },
         methods: {
             getJobStatus: function () {
                 console.log('getJobStatus');
-                axios.get(downloadStatusUri).then((response) => {
+                axios.get(downloadStatusUrl).then((response) => {
                     // handle success
                     this.status = response.data.status;
                     this.errors = response.data.errors;
@@ -121,7 +121,7 @@
                             this.warnings.length === 0 &&
                             this.errors.length === 0
                         ) {
-                            window.location = mappingUri;
+                            window.location = mappingUrl;
                             return;
                         }
                         return;
@@ -134,8 +134,8 @@
                 });
             },
             callStart: function () {
-                console.log('Call job start URI: ' + downloadStartUri);
-                axios.post(downloadStartUri).then((response) => {
+                console.log('Call job start URL: ' + downloadStartUrl);
+                axios.post(downloadStartUrl).then((response) => {
                     this.getJobStatus();
                 }).catch((error) => {
                     this.status = 'error';

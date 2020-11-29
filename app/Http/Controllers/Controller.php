@@ -46,7 +46,7 @@ class Controller extends BaseController
 
         $variables = [
             'FIREFLY_III_ACCESS_TOKEN' => 'spectre.access_token',
-            'FIREFLY_III_URI'          => 'spectre.uri',
+            'FIREFLY_III_URL'          => 'spectre.url',
         ];
         foreach ($variables as $env => $config) {
 

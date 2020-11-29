@@ -47,7 +47,7 @@ class SendTransactions
     private bool   $addTag;
     /** @var Configuration */
     private $configuration;
-    private string $rootURI;
+    private string $rootURL;
     private string $tag;
     private string $tagDate;
 
@@ -63,17 +63,17 @@ class SendTransactions
         $this->tagDate = date('Y-m-d');
         $this->createTag();
 
-        $this->rootURI = config('spectre.uri');
-        if ('' !== (string)config('spectre.vanity_uri')) {
-            $this->rootURI = config('spectre.vanity_uri');
+        $this->rootURL = config('spectre.url');
+        if ('' !== (string)config('spectre.vanity_url')) {
+            $this->rootURL = config('spectre.vanity_url');
         }
-        Log::debug(sprintf('The root URI is "%s"', $this->rootURI));
+        Log::debug(sprintf('The root URL is "%s"', $this->rootURL));
 
-        $uri   = (string)config('spectre.uri');
+        $url   = (string)config('spectre.url');
         $token = (string)config('spectre.access_token');
         foreach ($transactions as $index => $transaction) {
             app('log')->debug(sprintf('Trying to send transaction #%d', $index), $transaction);
-            $group = $this->sendTransaction($uri, $token, $index, $transaction);
+            $group = $this->sendTransaction($url, $token, $index, $transaction);
             if (null !== $group) {
                 $this->addTagToGroup($group);
             }
@@ -92,9 +92,9 @@ class SendTransactions
 
             return;
         }
-        $uri     = (string)config('spectre.uri');
+        $url     = (string)config('spectre.url');
         $token   = (string)config('spectre.access_token');
-        $request = new PostTagRequest($uri, $token);
+        $request = new PostTagRequest($url, $token);
         $request->setVerify(config('spectre.connection.verify'));
         $request->setTimeOut(config('spectre.connection.timeout'));
         $body = [
@@ -122,16 +122,16 @@ class SendTransactions
     }
 
     /**
-     * @param string $uri
+     * @param string $url
      * @param string $token
      * @param int    $index
      * @param array  $transaction
      *
      * @return TransactionGroup|null
      */
-    private function sendTransaction(string $uri, string $token, int $index, array $transaction): ?TransactionGroup
+    private function sendTransaction(string $url, string $token, int $index, array $transaction): ?TransactionGroup
     {
-        $request = new PostTransactionRequest($uri, $token);
+        $request = new PostTransactionRequest($url, $token);
 
         $request->setVerify(config('spectre.connection.verify'));
         $request->setTimeOut(config('spectre.connection.timeout'));
@@ -165,14 +165,14 @@ class SendTransactions
             return null;
         }
         $groupId  = $group->id;
-        $groupUri = (string)sprintf('%s/transactions/show/%d', $this->rootURI, $groupId);
+        $groupUrl = (string)sprintf('%s/transactions/show/%d', $this->rootURL, $groupId);
 
         /** @var Transaction $tr */
         foreach ($group->transactions as $tr) {
             $this->addMessage(
                 $index + 1,
                 sprintf(
-                    'Created transaction #%d: <a href="%s">%s</a> (%s %s)', $groupId, $groupUri, $tr->description, $tr->currencyCode,
+                    'Created transaction #%d: <a href="%s">%s</a> (%s %s)', $groupId, $groupUrl, $tr->description, $tr->currencyCode,
                     round((float)$tr->amount, 2)
                 )
             );
@@ -208,9 +208,9 @@ class SendTransactions
                 'tags'                   => $currentTags,
             ];
         }
-        $uri     = (string)config('spectre.uri');
+        $url     = (string)config('spectre.url');
         $token   = (string)config('spectre.access_token');
-        $request = new PutTransactionRequest($uri, $token, $groupId);
+        $request = new PutTransactionRequest($url, $token, $groupId);
         $request->setVerify(config('spectre.connection.verify'));
         $request->setTimeOut(config('spectre.connection.timeout'));
         $request->setBody($body);

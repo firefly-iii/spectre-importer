@@ -161,8 +161,8 @@ class MappingController extends Controller
     private function getFireflyIIIAccounts(): array
     {
         $token   = (string)config('spectre.access_token');
-        $uri     = (string)config('spectre.uri');
-        $request = new GetAccountsRequest($uri, $token);
+        $url     = (string)config('spectre.url');
+        $request = new GetAccountsRequest($url, $token);
 
         $request->setVerify(config('spectre.connection.verify'));
         $request->setTimeOut(config('spectre.connection.timeout'));
@@ -195,8 +195,8 @@ class MappingController extends Controller
     private function getFireflyIIICategories(): array
     {
         $token   = (string)config('spectre.access_token');
-        $uri     = (string)config('spectre.uri');
-        $request = new GetCategoriesRequest($uri, $token);
+        $url     = (string)config('spectre.url');
+        $request = new GetCategoriesRequest($url, $token);
 
         $request->setVerify(config('spectre.connection.verify'));
         $request->setTimeOut(config('spectre.connection.timeout'));

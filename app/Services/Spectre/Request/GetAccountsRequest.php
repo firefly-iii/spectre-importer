@@ -52,7 +52,7 @@ class GetAccountsRequest extends Request
         $this->setBase($url);
         $this->setAppId($appId);
         $this->setSecret($secret);
-        $this->setUri('accounts');
+        $this->setUrl('accounts');
     }
 
     /**

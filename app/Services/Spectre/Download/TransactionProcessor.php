@@ -68,10 +68,10 @@ class TransactionProcessor
         foreach ($accounts as $account) {
             $account = (string)$account;
             Log::debug(sprintf('Going to download transactions for account #%s', $account));
-            $uri                   = config('spectre.spectre_uri');
+            $url                   = config('spectre.spectre_url');
             $appId                 = config('spectre.spectre_app_id');
             $secret                = config('spectre.spectre_secret');
-            $request               = new GetTransactionsRequest($uri, $appId, $secret);
+            $request               = new GetTransactionsRequest($url, $appId, $secret);
             $request->accountId    = $account;
             $request->connectionId = $this->configuration->getConnection();
             /** @var GetTransactionsResponse $transactions */
@@ -94,10 +94,10 @@ class TransactionProcessor
     private function refreshConnection(): void
     {
         // refresh connection
-        $uri    = config('spectre.spectre_uri');
+        $url    = config('spectre.spectre_url');
         $appId  = config('spectre.spectre_app_id');
         $secret = config('spectre.spectre_secret');
-        $put    = new PutRefreshConnectionRequest($uri, $appId, $secret);
+        $put    = new PutRefreshConnectionRequest($url, $appId, $secret);
         $put->setConnection($this->configuration->getConnection());
         $response = $put->put();
         if ($response instanceof ErrorResponse) {

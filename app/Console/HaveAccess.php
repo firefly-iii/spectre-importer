@@ -37,9 +37,9 @@ trait HaveAccess
      */
     private function haveAccess(): bool
     {
-        $uri     = (string)config('spectre.uri');
+        $url     = (string)config('spectre.url');
         $token   = (string)config('spectre.access_token');
-        $request = new SystemInformationRequest($uri, $token);
+        $request = new SystemInformationRequest($url, $token);
 
         $request->setVerify(config('spectre.connection.verify'));
         $request->setTimeOut(config('spectre.connection.timeout'));
