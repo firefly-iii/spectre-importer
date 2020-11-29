@@ -133,6 +133,11 @@ class GenerateTransactions
     {
 
         //Log::debug('Original Spectre transaction', $entry);
+        $description = $entry['description'];
+        if (array_key_exists('extra', $entry) && array_key_exists('additional', $entry['extra'])) {
+            $description = trim(sprintf('%s %s', $description, (string)$entry['extra']['additional']));
+        }
+        
         $return = [
             'apply_rules'             => $this->configuration->isRules(),
             'error_if_duplicate_hash' => true,
@@ -142,7 +147,7 @@ class GenerateTransactions
                     'date'          => str_replace('T', ' ', substr($entry['made_on'], 0, 19)),
                     'datetime'      => $entry['made_on'], // not used in API, only for transaction filtering.
                     'amount'        => 0,
-                    'description'   => $entry['description'],
+                    'description'   => $description,
                     'order'         => 0,
                     'currency_code' => $entry['currency_code'],
                     'tags'          => [$entry['mode'], $entry['status'], $entry['category']],

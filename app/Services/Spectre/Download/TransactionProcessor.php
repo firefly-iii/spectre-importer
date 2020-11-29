@@ -43,8 +43,8 @@ class TransactionProcessor
     private const DATE_TIME_FORMAT = 'Y-m-d H:i:s';
     private Configuration $configuration;
     private string        $downloadIdentifier;
-    private ?Carbon $notAfter;
-    private ?Carbon $notBefore;
+    private ?Carbon       $notAfter;
+    private ?Carbon       $notBefore;
 
     /**
      * @return array
