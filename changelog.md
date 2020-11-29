@@ -6,19 +6,19 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ⚠️ Several changes in this release may break Firefly III's duplication detection or are backwards incompatible.
 
+### Added
+
+- [Issue 3510](https://github.com/firefly-iii/firefly-iii/issues/3510) You can pre-upload configuration files in `storage/configurations`.
+
 ### Changed
 
 - ⚠️ All environment variables that used to be called "URI" are now called "URL" because I finally learned the difference between a URL and a URI.
-
-## 2.0.1 - 2020-11-20
-
-### Changed
-
 - [Issue 3796](https://github.com/firefly-iii/firefly-iii/issues/3796) You can now set a custom Spectre identifier.
-
+- [Issue 3910](https://github.com/firefly-iii/firefly-iii/issues/3910) The importer will consider some meta fields for the description.
+ 
 ### Fixed
 
-- [Issue 4033](https://github.com/firefly-iii/firefly-iii/issues/4033) Better error handlign when running into DNS timeouts.
+- [Issue 4033](https://github.com/firefly-iii/firefly-iii/issues/4033) Better error handling when running into DNS timeouts.
 
 ## 2.0.0 - 2020-10-21
 
