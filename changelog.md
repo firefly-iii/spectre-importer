@@ -2,6 +2,14 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.1.0 - 2020-11-29
+
+⚠️ Several changes in this release may break Firefly III's duplication detection or are backwards incompatible.
+
+### Changed
+
+- ⚠️ All environment variables that used to be called "URI" are now called "URL" because I finally learned the difference between a URL and a URI.
+
 ## 2.0.1 - 2020-11-20
 
 ### Changed

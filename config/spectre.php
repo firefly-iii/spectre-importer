@@ -28,7 +28,7 @@ if ('/' === substr($fireflyIIIURL, -1)) {
 }
 
 return [
-    'version'             => '2.0.0',
+    'version'             => '2.1.0',
     'access_token'        => env('FIREFLY_III_ACCESS_TOKEN'),
     'url'                 => $fireflyIIIURL,
     'vanity_url'          => envNonEmpty('VANITY_URL'),
