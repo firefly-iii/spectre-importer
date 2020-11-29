@@ -64,7 +64,7 @@ class DownloadController extends Controller
         }
 
         // experimental get config TODO remove me.
-        $config = session()->get(Constants::CONFIGURATION) ?? [];
+        $config        = session()->get(Constants::CONFIGURATION) ?? [];
         $configuration = Configuration::fromArray($config);
 
         // call thing:
@@ -77,27 +77,6 @@ class DownloadController extends Controller
         app('log')->debug(sprintf('Stored "%s" under "%s"', $downloadIdentifier, Constants::DOWNLOAD_JOB_IDENTIFIER));
 
         return view('import.download.index', compact('mainTitle', 'subTitle', 'downloadIdentifier'));
-    }
-
-    /**
-     * @param Request $request
-     *
-     * @return JsonResponse
-     */
-    public function status(Request $request): JsonResponse
-    {
-        $downloadIdentifier = $request->get('downloadIdentifier');
-        if (null === $downloadIdentifier) {
-            app('log')->warning('Download Identifier is NULL.');
-            // no status is known yet because no identifier is in the session.
-            // As a fallback, return empty status
-            $fakeStatus = new JobStatus();
-
-            return response()->json($fakeStatus->toArray());
-        }
-        $importJobStatus = JobStatusManager::startOrFindJob($downloadIdentifier);
-
-        return response()->json($importJobStatus->toArray());
     }
 
     /**
@@ -134,6 +113,27 @@ class DownloadController extends Controller
         JobStatusManager::setJobStatus(JobStatus::JOB_DONE);
 
         return response()->json($downloadJobStatus->toArray());
+    }
+
+    /**
+     * @param Request $request
+     *
+     * @return JsonResponse
+     */
+    public function status(Request $request): JsonResponse
+    {
+        $downloadIdentifier = $request->get('downloadIdentifier');
+        if (null === $downloadIdentifier) {
+            app('log')->warning('Download Identifier is NULL.');
+            // no status is known yet because no identifier is in the session.
+            // As a fallback, return empty status
+            $fakeStatus = new JobStatus();
+
+            return response()->json($fakeStatus->toArray());
+        }
+        $importJobStatus = JobStatusManager::startOrFindJob($downloadIdentifier);
+
+        return response()->json($importJobStatus->toArray());
     }
 
 }

@@ -46,27 +46,52 @@ abstract class Request
     /** @var int */
     protected $expiresAt = 0;
     /** @var string */
+    private $appId;
+    /** @var string */
     private $base;
     /** @var array */
     private $body;
     /** @var array */
     private $parameters;
     /** @var string */
-    private $uri;
-
-    /** @var string */
-    private $appId;
-    /** @var string */
-    private $secret;
-
+    private       $secret;
     private float $timeOut = 3.14;
+    /** @var string */
+    private $url;
 
     /**
-     * @return string
+     * @return Response
+     * @throws SpectreHttpException
      */
-    public function getAppId(): string
+    abstract public function get(): Response;
+
+    /**
+     * @return Response
+     * @throws SpectreHttpException
+     */
+    abstract public function post(): Response;
+
+    /**
+     * @return Response
+     * @throws SpectreHttpException
+     */
+    abstract public function put(): Response;
+
+    /**
+     * @param array $body
+     */
+    public function setBody(array $body): void
     {
-        return $this->appId;
+        $this->body = $body;
+    }
+
+    /**
+     * @param array $parameters
+     */
+    public function setParameters(array $parameters): void
+    {
+        Log::debug('setParameters', $parameters);
+        $this->parameters = $parameters;
     }
 
     /**
@@ -75,6 +100,134 @@ abstract class Request
     public function setTimeOut(float $timeOut): void
     {
         $this->timeOut = $timeOut;
+    }
+
+    /**
+     * @return array
+     * @throws SpectreHttpException
+     * @throws SpectreErrorException
+     */
+    protected function authenticatedGet(): array
+    {
+        $fullUrl = sprintf('%s/%s', $this->getBase(), $this->getUrl());
+
+        if (null !== $this->parameters) {
+            $fullUrl = sprintf('%s?%s', $fullUrl, http_build_query($this->parameters));
+        }
+        $client = $this->getClient();
+        $res    = null;
+        $body   = null;
+        $json   = null;
+        try {
+            $res = $client->request(
+                'GET', $fullUrl, [
+                         'headers' => [
+                             'Accept'       => 'application/json',
+                             'Content-Type' => 'application/json',
+                             'App-id'       => $this->getAppId(),
+                             'Secret'       => $this->getSecret(),
+                         ],
+                     ]
+            );
+        } catch (TransferException $e) {
+            Log::error(sprintf('TransferException: %s', $e->getMessage()));
+            // if response, parse as error response.re
+            if (!$e->hasResponse()) {
+                throw new SpectreHttpException(sprintf('Exception: %s', $e->getMessage()));
+            }
+            $body = (string)$e->getResponse()->getBody();
+            $json = [];
+            try {
+                $json = json_decode($body, true, 512, JSON_THROW_ON_ERROR);
+            } catch (JsonException $e) {
+                Log::error(sprintf('Could not decode error: %s', $e->getMessage()));
+            }
+
+            $exception       = new SpectreErrorException;
+            $exception->json = $json;
+            throw $exception;
+        }
+        if (null !== $res && 200 !== $res->getStatusCode()) {
+            // return body, class must handle this
+            Log::error(sprintf('Status code is %d', $res->getStatusCode()));
+
+            $body = (string)$res->getBody();
+        }
+        $body = $body ?? (string)$res->getBody();
+
+        try {
+            $json = json_decode($body, true, 512, JSON_THROW_ON_ERROR);
+        } catch (JsonException $e) {
+            throw new SpectreHttpException(
+                sprintf(
+                    'Could not decode JSON (%s). Error[%d] is: %s. Response: %s',
+                    $fullUrl,
+                    $res ? $res->getStatusCode() : 0,
+                    $e->getMessage(),
+                    $body
+                )
+            );
+        }
+
+        if (null === $json) {
+            throw new SpectreHttpException(sprintf('Body is empty. Status code is %d.', $res->getStatusCode()));
+        }
+
+        return $json;
+    }
+
+    /**
+     * @return string
+     */
+    public function getBase(): string
+    {
+        return $this->base;
+    }
+
+    /**
+     * @param string $base
+     */
+    public function setBase(string $base): void
+    {
+        $this->base = $base;
+    }
+
+    /**
+     * @return string
+     */
+    public function getUrl(): string
+    {
+        return $this->url;
+    }
+
+    /**
+     * @param string $url
+     */
+    public function setUrl(string $url): void
+    {
+        $this->url = $url;
+    }
+
+    /**
+     * @return Client
+     */
+    private function getClient(): Client
+    {
+        // config here
+
+        return new Client(
+            [
+                'connect_timeout' => $this->timeOut,
+            ]
+        );
+    }
+
+    /**
+     * @return string
+     */
+    public function getAppId(): string
+    {
+        return $this->appId;
     }
 
     /**
@@ -101,149 +254,19 @@ abstract class Request
         $this->secret = $secret;
     }
 
-
-    /**
-     * @param string $base
-     */
-    public function setBase(string $base): void
-    {
-        $this->base = $base;
-    }
-
-    /**
-     * @param array $body
-     */
-    public function setBody(array $body): void
-    {
-        $this->body = $body;
-    }
-
-    /**
-     * @param array $parameters
-     */
-    public function setParameters(array $parameters): void
-    {
-        Log::debug('setParameters', $parameters);
-        $this->parameters = $parameters;
-    }
-
-    /**
-     * @param string $uri
-     */
-    public function setUri(string $uri): void
-    {
-        $this->uri = $uri;
-    }
-
-    /**
-     * @return string
-     */
-    public function getBase(): string
-    {
-        return $this->base;
-    }
-
-    /**
-     * @return string
-     */
-    public function getUri(): string
-    {
-        return $this->uri;
-    }
-
-    /**
-     * @throws SpectreHttpException
-     * @return Response
-     */
-    abstract public function get(): Response;
-
-    /**
-     * @throws SpectreErrorException
-     * @throws SpectreHttpException
-     * @return array
-     */
-    protected function authenticatedGet(): array
-    {
-        $fullUri = sprintf('%s/%s', $this->getBase(), $this->getUri());
-
-        if (null !== $this->parameters) {
-            $fullUri = sprintf('%s?%s', $fullUri, http_build_query($this->parameters));
-        }
-        $client = $this->getClient();
-        $res    = null;
-        $body   = null;
-        $json   = null;
-        try {
-            $res = $client->request(
-                'GET', $fullUri, [
-                         'headers' => [
-                             'Accept'       => 'application/json',
-                             'Content-Type' => 'application/json',
-                             'App-id'       => $this->getAppId(),
-                             'Secret'       => $this->getSecret(),
-                         ],
-                     ]
-            );
-        } catch (TransferException $e) {
-            Log::error(sprintf('TransferException: %s', $e->getMessage()));
-            // if response, parse as error response.re
-            if (!$e->hasResponse()) {
-                throw new SpectreHttpException(sprintf('Exception: %s', $e->getMessage()));
-            }
-            $body = (string) $e->getResponse()->getBody();
-            $json = [];
-            try {
-                $json = json_decode($body, true, 512, JSON_THROW_ON_ERROR);
-            } catch (JsonException $e) {
-                Log::error(sprintf('Could not decode error: %s', $e->getMessage()));
-            }
-
-            $exception       = new SpectreErrorException;
-            $exception->json = $json;
-            throw $exception;
-        }
-        if (null !== $res && 200 !== $res->getStatusCode()) {
-            // return body, class must handle this
-            Log::error(sprintf('Status code is %d', $res->getStatusCode()));
-
-            $body = (string) $res->getBody();
-        }
-        $body = $body ?? (string) $res->getBody();
-
-        try {
-            $json = json_decode($body, true, 512, JSON_THROW_ON_ERROR);
-        } catch (JsonException $e) {
-            throw new SpectreHttpException(
-                sprintf(
-                    'Could not decode JSON (%s). Error[%d] is: %s. Response: %s',
-                    $fullUri,
-                    $res ? $res->getStatusCode() : 0,
-                    $e->getMessage(),
-                    $body
-                )
-            );
-        }
-
-        if (null === $json) {
-            throw new SpectreHttpException(sprintf('Body is empty. Status code is %d.', $res->getStatusCode()));
-        }
-
-        return $json;
-    }
-
     /**
      * @param array $data
      *
-     * @throws ImportException
      * @return array
      *
+     * @throws ImportException
      */
     protected function sendSignedSpectrePost(array $data): array
     {
-        if ('' === $this->uri) {
+        if ('' === $this->url) {
             throw new ImportException('No Spectre server defined');
         }
-        $fullUri = sprintf('%s/%s', $this->getBase(), $this->getUri());
+        $fullUrl = sprintf('%s/%s', $this->getBase(), $this->getUrl());
         $headers = $this->getDefaultHeaders();
         try {
             $body = json_encode($data, JSON_THROW_ON_ERROR);
@@ -254,7 +277,7 @@ abstract class Request
         Log::debug('Final headers for spectre signed POST request:', $headers);
         try {
             $client = $this->getClient();
-            $res    = $client->request('POST', $fullUri, ['headers' => $headers, 'body' => $body]);
+            $res    = $client->request('POST', $fullUrl, ['headers' => $headers, 'body' => $body]);
         } catch (GuzzleException|Exception $e) {
             throw new ImportException(sprintf('Guzzle Exception: %s', $e->getMessage()));
         }
@@ -282,18 +305,37 @@ abstract class Request
     }
 
     /**
-     * @param array  $data
+     * @return array
+     */
+    protected function getDefaultHeaders(): array
+    {
+        $userAgent       = sprintf('FireflyIII Spectre v%s', config('spectre.version'));
+        $this->expiresAt = time() + 180;
+
+        return [
+            'App-id'        => $this->getAppId(),
+            'Secret'        => $this->getSecret(),
+            'Accept'        => 'application/json',
+            'Content-type'  => 'application/json',
+            'Cache-Control' => 'no-cache',
+            'User-Agent'    => $userAgent,
+            'Expires-at'    => $this->expiresAt,
+        ];
+    }
+
+    /**
+     * @param array $data
      *
-     * @throws ImportException
      * @return array
      *
+     * @throws ImportException
      */
     protected function sendUnsignedSpectrePost(array $data): array
     {
-        if ('' === $this->uri) {
+        if ('' === $this->url) {
             throw new ImportException('No Spectre server defined');
         }
-        $fullUri = sprintf('%s/%s', $this->getBase(), $this->getUri());
+        $fullUrl = sprintf('%s/%s', $this->getBase(), $this->getUrl());
         $headers = $this->getDefaultHeaders();
         $opts    = ['headers' => $headers];
         $body    = null;
@@ -302,14 +344,14 @@ abstract class Request
         } catch (JsonException $e) {
             Log::error($e->getMessage());
         }
-        if ('{}' !== (string) $body) {
+        if ('{}' !== (string)$body) {
             $opts['body'] = $body;
         }
 
         Log::debug('Final headers for spectre UNsigned POST request:', $headers);
         try {
             $client = $this->getClient();
-            $res    = $client->request('POST', $fullUri, $opts);
+            $res    = $client->request('POST', $fullUrl, $opts);
         } catch (GuzzleException|Exception $e) {
             Log::error($e->getMessage());
             throw new ImportException(sprintf('Guzzle Exception: %s', $e->getMessage()));
@@ -340,16 +382,16 @@ abstract class Request
     /**
      * @param array $data
      *
-     * @throws ImportException
      * @return array
      *
+     * @throws ImportException
      */
     protected function sendUnsignedSpectrePut(array $data): array
     {
-        if ('' === $this->uri) {
+        if ('' === $this->url) {
             throw new ImportException('No Spectre server defined');
         }
-        $fullUri = sprintf('%s/%s', $this->getBase(), $this->getUri());
+        $fullUrl = sprintf('%s/%s', $this->getBase(), $this->getUrl());
         $headers = $this->getDefaultHeaders();
         $opts    = ['headers' => $headers];
         $body    = null;
@@ -359,13 +401,13 @@ abstract class Request
         } catch (JsonException $e) {
             Log::error($e->getMessage());
         }
-        if ('{}' !== (string) $body) {
+        if ('{}' !== (string)$body) {
             $opts['body'] = $body;
         }
         //Log::debug('Final body + headers for spectre UNsigned PUT request:', $opts);
         try {
             $client = $this->getClient();
-            $res    = $client->request('PUT', $fullUri, $opts);
+            $res    = $client->request('PUT', $fullUrl, $opts);
         } catch (RequestException|GuzzleException $e) {
             // get response.
             $response = $e->getResponse();
@@ -373,14 +415,16 @@ abstract class Request
                 // ignore it, just log it.
                 $statusCode                 = $response->getStatusCode();
                 $responseHeaders            = $response->getHeaders();
-                $json                       = json_decode((string) $e->getResponse()->getBody(), true, 512, JSON_THROW_ON_ERROR);
+                $json                       = json_decode((string)$e->getResponse()->getBody(), true, 512, JSON_THROW_ON_ERROR);
                 $json['ResponseHeaders']    = $responseHeaders;
                 $json['ResponseStatusCode'] = $statusCode;
 
                 return $json;
             }
             Log::error($e->getMessage());
-            Log::error((string)$e->getResponse()->getBody());
+            if (null !== $response) {
+                Log::error((string)$e->getResponse()->getBody());
+            }
             throw new ImportException(sprintf('Request Exception: %s', $e->getMessage()));
         }
 
@@ -404,50 +448,5 @@ abstract class Request
         $json['ResponseStatusCode'] = $statusCode;
 
         return $json;
-    }
-
-    /**
-     * @throws SpectreHttpException
-     * @return Response
-     */
-    abstract public function put(): Response;
-
-    /**
-     * @throws SpectreHttpException
-     * @return Response
-     */
-    abstract public function post(): Response;
-
-    /**
-     * @return Client
-     */
-    private function getClient(): Client
-    {
-        // config here
-
-        return new Client(
-            [
-                'connect_timeout' => $this->timeOut,
-            ]
-        );
-    }
-
-    /**
-     * @return array
-     */
-    protected function getDefaultHeaders(): array
-    {
-        $userAgent       = sprintf('FireflyIII Spectre v%s', config('spectre.version'));
-        $this->expiresAt = time() + 180;
-
-        return [
-            'App-id'        => $this->getAppId(),
-            'Secret'        => $this->getSecret(),
-            'Accept'        => 'application/json',
-            'Content-type'  => 'application/json',
-            'Cache-Control' => 'no-cache',
-            'User-Agent'    => $userAgent,
-            'Expires-at'    => $this->expiresAt,
-        ];
     }
 }

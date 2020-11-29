@@ -32,8 +32,10 @@ use App\Services\Sync\JobStatus\JobStatus;
 use App\Services\Sync\JobStatus\JobStatusManager;
 use App\Services\Sync\RoutineManager;
 use ErrorException;
+use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 use Log;
 use TypeError;
 
@@ -52,7 +54,7 @@ class SyncController extends Controller
     }
 
     /**
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     * @return Factory|View
      */
     public function index()
     {
@@ -67,13 +69,13 @@ class SyncController extends Controller
 
         // get configuration object.
         $configuration = Configuration::fromArray(session()->get(Constants::CONFIGURATION));
-        if (true===$configuration->emptyMapping()) {
+        if (true === $configuration->emptyMapping()) {
             // no mapping, back to roles
-            $jobBackUri = route('back.config');
+            $jobBackUrl = route('back.config');
         }
-        if (false===$configuration->emptyMapping()) {
+        if (false === $configuration->emptyMapping()) {
             // back to mapping
-            $jobBackUri = route('back.mapping');
+            $jobBackUrl = route('back.mapping');
         }
 
         if (null === $syncIdentifier) {
@@ -91,7 +93,7 @@ class SyncController extends Controller
         session()->put(Constants::SYNC_JOB_IDENTIFIER, $syncIdentifier);
         app('log')->debug(sprintf('Stored "%s" under "%s"', $syncIdentifier, Constants::SYNC_JOB_IDENTIFIER));
 
-        return view('import.sync.index', compact('mainTitle', 'jobBackUri', 'subTitle', 'syncIdentifier', 'downloadIdentifier'));
+        return view('import.sync.index', compact('mainTitle', 'jobBackUrl', 'subTitle', 'syncIdentifier', 'downloadIdentifier'));
     }
 
     /**
@@ -117,6 +119,7 @@ class SyncController extends Controller
         $downloadJobStatus = JobStatusManager::startOrFindJob($syncIdentifier);
         if (JobStatus::JOB_DONE === $downloadJobStatus->status) {
             app('log')->debug('Job already done!');
+
             return response()->json($downloadJobStatus->toArray());
         }
         JobStatusManager::setJobStatus(JobStatus::JOB_RUNNING);

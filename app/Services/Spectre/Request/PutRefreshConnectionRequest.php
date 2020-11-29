@@ -49,7 +49,7 @@ class PutRefreshConnectionRequest extends Request
         $this->setBase($url);
         $this->setAppId($appId);
         $this->setSecret($secret);
-        $this->setUri('connections/%s/refresh');
+        $this->setUrl('connections/%s/refresh');
     }
 
     /**
@@ -71,7 +71,7 @@ class PutRefreshConnectionRequest extends Request
      */
     public function put(): Response
     {
-        $this->setUri(sprintf($this->getUri(), $this->connection));
+        $this->setUrl(sprintf($this->getUrl(), $this->connection));
 
         $response = $this->sendUnsignedSpectrePut([]);
 

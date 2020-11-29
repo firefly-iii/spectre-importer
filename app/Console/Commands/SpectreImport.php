@@ -37,6 +37,7 @@ use Illuminate\Console\Command;
 class SpectreImport extends Command
 {
     use HaveAccess, VerifyJSON, StartDownload, StartSync, ManageMessages;
+
     /**
      * The console command description.
      *

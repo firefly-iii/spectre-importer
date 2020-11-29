@@ -33,13 +33,13 @@ use Str;
  */
 class RoutineManager
 {
-    private string $downloadIdentifier;
+    /** @var string */
+    private const DISKNAME = 'downloads';
     private array  $allErrors;
     private array  $allMessages;
     private array  $allWarnings;
-    /** @var string */
-    private const DISKNAME = 'downloads';
     private Configuration        $configuration;
+    private string $downloadIdentifier;
     private TransactionProcessor $transactionProcessor;
 
     /**
@@ -67,28 +67,6 @@ class RoutineManager
     }
 
     /**
-     * @return string
-     */
-    public function getDownloadIdentifier(): string
-    {
-        return $this->downloadIdentifier;
-    }
-
-    /**
-     *
-     */
-    public function start(): void
-    {
-
-        // get transactions from Spectre
-        $transactions = $this->transactionProcessor->download();
-
-        // store on drive in downloadIdentifier.
-        $disk = Storage::disk(self::DISKNAME);
-        $disk->put($this->downloadIdentifier, json_encode($transactions, JSON_THROW_ON_ERROR, 512));
-    }
-
-    /**
      *
      */
     private function generateDownloadIdentifier(): void
@@ -106,15 +84,12 @@ class RoutineManager
     }
 
     /**
-     * @param Configuration $configuration
+     * @return array
      */
-    public function setConfiguration(Configuration $configuration): void
+    public function getAllErrors(): array
     {
-        $this->configuration = $configuration;
-        $this->transactionProcessor->setConfiguration($configuration);
-        $this->transactionProcessor->setDownloadIdentifier($this->downloadIdentifier);
+        return $this->allErrors;
     }
-
 
     /**
      * @return array
@@ -133,11 +108,35 @@ class RoutineManager
     }
 
     /**
-     * @return array
+     * @return string
      */
-    public function getAllErrors(): array
+    public function getDownloadIdentifier(): string
     {
-        return $this->allErrors;
+        return $this->downloadIdentifier;
+    }
+
+    /**
+     * @param Configuration $configuration
+     */
+    public function setConfiguration(Configuration $configuration): void
+    {
+        $this->configuration = $configuration;
+        $this->transactionProcessor->setConfiguration($configuration);
+        $this->transactionProcessor->setDownloadIdentifier($this->downloadIdentifier);
+    }
+
+    /**
+     *
+     */
+    public function start(): void
+    {
+
+        // get transactions from Spectre
+        $transactions = $this->transactionProcessor->download();
+
+        // store on drive in downloadIdentifier.
+        $disk = Storage::disk(self::DISKNAME);
+        $disk->put($this->downloadIdentifier, json_encode($transactions, JSON_THROW_ON_ERROR, 512));
     }
 
 

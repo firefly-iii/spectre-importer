@@ -30,6 +30,7 @@ namespace App\Services\Spectre\Response;
 class PutRefreshConnectionResponse extends Response
 {
     private array $data;
+
     /**
      * @inheritDoc
      */

@@ -33,6 +33,78 @@ use Illuminate\Foundation\Http\FormRequest;
 class Request extends FormRequest
 {
     /**
+     * @param string|int|null|bool $value
+     *
+     * @return bool
+     */
+    protected function convertBoolean($value): bool
+    {
+        if (null === $value) {
+            return false;
+        }
+        if ('true' === $value) {
+            return true;
+        }
+        if ('yes' === $value) {
+            return true;
+        }
+        if (1 === $value) {
+            return true;
+        }
+        if ('1' === $value) {
+            return true;
+        }
+        if (true === $value) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Return date or NULL.
+     *
+     * @param string $field
+     *
+     * @return Carbon|null
+     */
+    protected function date(string $field): ?Carbon
+    {
+        $result = null;
+        try {
+            $result = $this->get($field) ? new Carbon($this->get($field)) : null;
+        } catch (Exception $e) {
+            app('log')->debug(sprintf('Exception when parsing date. Not interesting: %s', $e->getMessage()));
+        }
+
+        return $result;
+    }
+
+    /**
+     * Return integer value.
+     *
+     * @param string $field
+     *
+     * @return int
+     */
+    protected function integer(string $field): int
+    {
+        return (int)$this->get($field);
+    }
+
+    /**
+     * Return string value.
+     *
+     * @param string $field
+     *
+     * @return string
+     */
+    protected function string(string $field): string
+    {
+        return $this->cleanString((string)($this->get($field) ?? ''));
+    }
+
+    /**
      * Remove weird chars from strings.
      *
      * @param string $string
@@ -93,78 +165,6 @@ class Request extends FormRequest
         $string  = str_replace(["\n", "\t", "\r"], "\x20", $string);
 
         return trim($string);
-    }
-
-    /**
-     * @param string|int|null|bool $value
-     *
-     * @return bool
-     */
-    protected function convertBoolean($value): bool
-    {
-        if (null === $value) {
-            return false;
-        }
-        if ('true' === $value) {
-            return true;
-        }
-        if ('yes' === $value) {
-            return true;
-        }
-        if (1 === $value) {
-            return true;
-        }
-        if ('1' === $value) {
-            return true;
-        }
-        if (true === $value) {
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * Return date or NULL.
-     *
-     * @param string $field
-     *
-     * @return Carbon|null
-     */
-    protected function date(string $field): ?Carbon
-    {
-        $result = null;
-        try {
-            $result = $this->get($field) ? new Carbon($this->get($field)) : null;
-        } catch (Exception $e) {
-            app('log')->debug(sprintf('Exception when parsing date. Not interesting: %s', $e->getMessage()));
-        }
-
-        return $result;
-    }
-
-    /**
-     * Return integer value.
-     *
-     * @param string $field
-     *
-     * @return int
-     */
-    protected function integer(string $field): int
-    {
-        return (int) $this->get($field);
-    }
-
-    /**
-     * Return string value.
-     *
-     * @param string $field
-     *
-     * @return string
-     */
-    protected function string(string $field): string
-    {
-        return $this->cleanString((string) ($this->get($field) ?? ''));
     }
 
 }

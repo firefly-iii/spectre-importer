@@ -26,7 +26,6 @@ declare(strict_types=1);
 namespace App\Services\Spectre\Request;
 
 use App\Exceptions\SpectreErrorException;
-use App\Exceptions\SpectreHttpException;
 use App\Services\Spectre\Response\ErrorResponse;
 use App\Services\Spectre\Response\ListCustomersResponse;
 use App\Services\Spectre\Response\Response;
@@ -51,7 +50,7 @@ class ListCustomersRequest extends Request
         $this->setBase($url);
         $this->setAppId($appId);
         $this->setSecret($secret);
-        $this->setUri('customers');
+        $this->setUrl('customers');
     }
 
     /**
@@ -66,15 +65,8 @@ class ListCustomersRequest extends Request
             // JSON thing.
             return new ErrorResponse($e->json ?? []);
         }
-        return new ListCustomersResponse($response['data']);
-    }
 
-    /**
-     * @inheritDoc
-     */
-    public function put(): Response
-    {
-        // TODO: Implement put() method.
+        return new ListCustomersResponse($response['data']);
     }
 
     /**
@@ -83,5 +75,13 @@ class ListCustomersRequest extends Request
     public function post(): Response
     {
         // TODO: Implement post() method.
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function put(): Response
+    {
+        // TODO: Implement put() method.
     }
 }

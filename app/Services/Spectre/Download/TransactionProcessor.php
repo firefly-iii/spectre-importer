@@ -24,6 +24,7 @@ declare(strict_types=1);
 
 namespace App\Services\Spectre\Download;
 
+use App\Exceptions\SpectreHttpException;
 use App\Services\Configuration\Configuration;
 use App\Services\Spectre\Model\Transaction;
 use App\Services\Spectre\Request\GetTransactionsRequest;
@@ -38,13 +39,12 @@ use Log;
  */
 class TransactionProcessor
 {
-    private Configuration $configuration;
-    private string        $downloadIdentifier;
     /** @var string */
     private const DATE_TIME_FORMAT = 'Y-m-d H:i:s';
-
-    private ?Carbon $notBefore;
-    private ?Carbon $notAfter;
+    private Configuration $configuration;
+    private string        $downloadIdentifier;
+    private ?Carbon       $notAfter;
+    private ?Carbon       $notBefore;
 
     /**
      * @return array
@@ -53,12 +53,12 @@ class TransactionProcessor
     {
         $this->refreshConnection();
         $this->notBefore = null;
-        $this->notAfter = null;
-        if ('' !== (string) $this->configuration->getDateNotBefore()) {
+        $this->notAfter  = null;
+        if ('' !== (string)$this->configuration->getDateNotBefore()) {
             $this->notBefore = new Carbon($this->configuration->getDateNotBefore());
         }
 
-        if ('' !== (string) $this->configuration->getDateNotAfter()) {
+        if ('' !== (string)$this->configuration->getDateNotAfter()) {
             $this->notAfter = new Carbon($this->configuration->getDateNotAfter());
         }
 
@@ -66,12 +66,12 @@ class TransactionProcessor
         $accounts = array_keys($this->configuration->getAccounts());
         $return   = [];
         foreach ($accounts as $account) {
-            $account = (string) $account;
+            $account = (string)$account;
             Log::debug(sprintf('Going to download transactions for account #%s', $account));
-            $uri                   = config('spectre.spectre_uri');
+            $url                   = config('spectre.spectre_url');
             $appId                 = config('spectre.spectre_app_id');
             $secret                = config('spectre.spectre_secret');
-            $request               = new GetTransactionsRequest($uri, $appId, $secret);
+            $request               = new GetTransactionsRequest($url, $appId, $secret);
             $request->accountId    = $account;
             $request->connectionId = $this->configuration->getConnection();
             /** @var GetTransactionsResponse $transactions */
@@ -89,19 +89,21 @@ class TransactionProcessor
     }
 
     /**
-     * @param Configuration $configuration
+     * @throws SpectreHttpException
      */
-    public function setConfiguration(Configuration $configuration): void
+    private function refreshConnection(): void
     {
-        $this->configuration = $configuration;
-    }
-
-    /**
-     * @param string $downloadIdentifier
-     */
-    public function setDownloadIdentifier(string $downloadIdentifier): void
-    {
-        $this->downloadIdentifier = $downloadIdentifier;
+        // refresh connection
+        $url    = config('spectre.spectre_url');
+        $appId  = config('spectre.spectre_app_id');
+        $secret = config('spectre.spectre_secret');
+        $put    = new PutRefreshConnectionRequest($url, $appId, $secret);
+        $put->setConnection($this->configuration->getConnection());
+        $response = $put->put();
+        if ($response instanceof ErrorResponse) {
+            Log::alert('Could not refresh connection.');
+            Log::alert(sprintf('%s: %s', $response->class, $response->message));
+        }
     }
 
     /**
@@ -110,10 +112,10 @@ class TransactionProcessor
     private function filterTransactions(GetTransactionsResponse $transactions): array
     {
         Log::debug(sprintf('Going to filter downloaded transactions. Original set length is %d', count($transactions)));
-        if(null !== $this->notBefore) {
+        if (null !== $this->notBefore) {
             Log::debug(sprintf('Will not grab transactions before "%s"', $this->notBefore->format('Y-m-d H:i:s')));
         }
-        if(null !== $this->notAfter) {
+        if (null !== $this->notAfter) {
             Log::debug(sprintf('Will not grab transactions after "%s"', $this->notAfter->format('Y-m-d H:i:s')));
         }
         $return = [];
@@ -151,21 +153,19 @@ class TransactionProcessor
     }
 
     /**
-     * @throws \App\Exceptions\SpectreHttpException
+     * @param Configuration $configuration
      */
-    private function refreshConnection(): void
+    public function setConfiguration(Configuration $configuration): void
     {
-        // refresh connection
-        $uri    = config('spectre.spectre_uri');
-        $appId  = config('spectre.spectre_app_id');
-        $secret = config('spectre.spectre_secret');
-        $put    = new PutRefreshConnectionRequest($uri, $appId, $secret);
-        $put->setConnection($this->configuration->getConnection());
-        $response = $put->put();
-        if ($response instanceof ErrorResponse) {
-            Log::alert('Could not refresh connection.');
-            Log::alert(sprintf('%s: %s', $response->class, $response->message));
-        }
+        $this->configuration = $configuration;
+    }
+
+    /**
+     * @param string $downloadIdentifier
+     */
+    public function setDownloadIdentifier(string $downloadIdentifier): void
+    {
+        $this->downloadIdentifier = $downloadIdentifier;
     }
 
 }

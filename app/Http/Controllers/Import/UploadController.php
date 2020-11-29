@@ -107,6 +107,25 @@ class UploadController extends Controller
             }
         }
 
+        // if no uploaded config file, read and use the submitted existing file, if any.
+        $existingFile = (string)$request->get('existing_config');
+
+        if (null === $configFile && '' !== $existingFile) {
+            Log::debug('User selected a config file from the store.');
+            $disk = Storage::disk('configurations');
+            $configFileName = StorageService::storeContent($disk->get($existingFile));
+
+            session()->put(Constants::UPLOAD_CONFIG_FILE, $configFileName);
+
+            // process the config file
+            try {
+                $configuration = ConfigFileProcessor::convertConfigFile($configFileName);
+                session()->put(Constants::CONFIGURATION, $configuration->toArray());
+            } catch (ImportException $e) {
+                $errors->add('config_file', $e->getMessage());
+            }
+        }
+
         if ($errors->count() > 0) {
             return redirect(route('import.start'))->withErrors($errors);
         }

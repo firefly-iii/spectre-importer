@@ -24,10 +24,10 @@ declare(strict_types=1);
 
 namespace App\Console;
 
-use App\Services\Spectre\Download\JobStatus\JobStatusManager;
-use App\Services\Spectre\Download\RoutineManager as DownloadRoutineMananger;
 use App\Exceptions\ImportException;
 use App\Services\Configuration\Configuration;
+use App\Services\Spectre\Download\JobStatus\JobStatusManager;
+use App\Services\Spectre\Download\RoutineManager as DownloadRoutineMananger;
 
 /**
  * Trait StartDownload.

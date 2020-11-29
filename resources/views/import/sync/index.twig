@@ -27,11 +27,11 @@
 {% endblock %}
 {% block scripts %}
     <script type="text/javascript">
-        var syncStatusUri = '{{ route('import.sync.status') }}?syncIdentifier={{ syncIdentifier }}';
-        var syncStartUri = '{{ route('import.sync.start') }}?syncIdentifier={{ syncIdentifier }}';
-        var jobBackUri = '{{ jobBackUri }}';
-        var configDownloadUri = '{{ route('import.configuration.download') }}?downloadIdentifier={{ downloadIdentifier }}';
-        var flushUri = '{{ route('flush') }}';
+        var syncStatusUrl = '{{ route('import.sync.status') }}?syncIdentifier={{ syncIdentifier }}';
+        var syncStartUrl = '{{ route('import.sync.start') }}?syncIdentifier={{ syncIdentifier }}';
+        var jobBackUrl = '{{ jobBackUrl }}';
+        var configDownloadUrl = '{{ route('import.configuration.download') }}?downloadIdentifier={{ downloadIdentifier }}';
+        var flushUrl = '{{ route('flush') }}';
     </script>
     <script src="js/sync.js" type="text/javascript"></script>
 {% endblock %}

@@ -70,9 +70,9 @@ class GenerateTransactions
     {
         Log::debug('Going to collect all target accounts from Firefly III.');
         // send account list request to Firefly III.
-        $token   = (string) config('spectre.access_token');
-        $uri     = (string) config('spectre.uri');
-        $request = new GetAccountsRequest($uri, $token);
+        $token   = (string)config('spectre.access_token');
+        $url     = (string)config('spectre.url');
+        $request = new GetAccountsRequest($url, $token);
         /** @var GetAccountsResponse $result */
         $result = $request->get();
         $return = [];
@@ -84,7 +84,7 @@ class GenerateTransactions
                 continue;
             }
             $iban = $entry->iban;
-            if ('' === (string) $iban) {
+            if ('' === (string)$iban) {
                 continue;
             }
             Log::debug(sprintf('Collected %s (%s) under ID #%d', $iban, $entry->type, $entry->id));
@@ -99,15 +99,15 @@ class GenerateTransactions
     /**
      * @param array $spectre
      *
-     * @throws ImportException
      * @return array
+     * @throws ImportException
      */
     public function getTransactions(array $spectre): array
     {
         $return = [];
         /**
          * @var string $spectreAccountId
-         * @var array $entries
+         * @var array  $entries
          */
         foreach ($spectre as $spectreAccountId => $entries) {
             $spectreAccountId = (string)$spectreAccountId;
@@ -123,25 +123,21 @@ class GenerateTransactions
     }
 
     /**
-     * @param Configuration $configuration
-     */
-    public function setConfiguration(Configuration $configuration): void
-    {
-        $this->configuration = $configuration;
-        $this->accounts      = $configuration->getAccounts();
-    }
-
-    /**
-     * @param string   $spectreAccountId
-     * @param array $entry
+     * @param string $spectreAccountId
+     * @param array  $entry
      *
-     * @throws ImportException
      * @return array
+     * @throws ImportException
      */
     private function generateTransaction(string $spectreAccountId, array $entry): array
     {
 
         //Log::debug('Original Spectre transaction', $entry);
+        $description = $entry['description'];
+        if (array_key_exists('extra', $entry) && array_key_exists('additional', $entry['extra'])) {
+            $description = trim(sprintf('%s %s', $description, (string)$entry['extra']['additional']));
+        }
+        
         $return = [
             'apply_rules'             => $this->configuration->isRules(),
             'error_if_duplicate_hash' => true,
@@ -151,7 +147,7 @@ class GenerateTransactions
                     'date'          => str_replace('T', ' ', substr($entry['made_on'], 0, 19)),
                     'datetime'      => $entry['made_on'], // not used in API, only for transaction filtering.
                     'amount'        => 0,
-                    'description'   => $entry['description'],
+                    'description'   => $description,
                     'order'         => 0,
                     'currency_code' => $entry['currency_code'],
                     'tags'          => [$entry['mode'], $entry['status'], $entry['category']],
@@ -160,7 +156,7 @@ class GenerateTransactions
                 ],
             ],
         ];
-        if($this->configuration->isIgnoreSpectreCategories()) {
+        if ($this->configuration->isIgnoreSpectreCategories()) {
             Log::debug('Remove Spectre categories + tags.');
             unset($return['transactions'][0]['tags'], $return['transactions'][0]['category_name'], $return['transactions'][0]['category_id']);
         }
@@ -175,7 +171,7 @@ class GenerateTransactions
             $return['transactions'][0]['amount'] = $entry['amount'];
 
             // destination is Spectre
-            $return['transactions'][0]['destination_id'] = (int) $this->accounts[$spectreAccountId];
+            $return['transactions'][0]['destination_id'] = (int)$this->accounts[$spectreAccountId];
 
             // source is the other side:
             $return['transactions'][0]['source_name'] = $entry['extra']['payee'] ?? '(unknown source account)';
@@ -204,7 +200,7 @@ class GenerateTransactions
             $return['transactions'][0]['amount'] = bcmul($entry['amount'], '-1');
 
             // source is Spectre:
-            $return['transactions'][0]['source_id'] = (int) $this->accounts[$spectreAccountId];
+            $return['transactions'][0]['source_id'] = (int)$this->accounts[$spectreAccountId];
             // dest is shop
             $return['transactions'][0]['destination_name'] = $entry['extra']['payee'] ?? '(unknown destination account)';
 
@@ -232,28 +228,6 @@ class GenerateTransactions
     }
 
     /**
-     * @param int $accountId
-     *
-     * @throws ApiHttpException
-     * @return string
-     */
-    private function getAccountType(int $accountId): string
-    {
-        $uri   = (string) config('spectre.uri');
-        $token = (string) config('spectre.access_token');
-        app('log')->debug(sprintf('Going to download account #%d', $accountId));
-        $request = new GetAccountRequest($uri, $token);
-        $request->setId($accountId);
-        /** @var GetAccountResponse $result */
-        $result = $request->get();
-        $type   = $result->getAccount()->type;
-
-        app('log')->debug(sprintf('Discovered that account #%d is of type "%s"', $accountId, $type));
-
-        return $type;
-    }
-
-    /**
      * @param string $name
      * @param string $iban
      *
@@ -262,7 +236,7 @@ class GenerateTransactions
     private function getMappedAccountId(string $name): ?int
     {
         if (isset($this->configuration->getMapping()['accounts'][$name])) {
-            return (int) $this->configuration->getMapping()['accounts'][$name];
+            return (int)$this->configuration->getMapping()['accounts'][$name];
         }
 
         return null;
@@ -293,11 +267,33 @@ class GenerateTransactions
     }
 
     /**
+     * @param int $accountId
+     *
+     * @return string
+     * @throws ApiHttpException
+     */
+    private function getAccountType(int $accountId): string
+    {
+        $url   = (string)config('spectre.url');
+        $token = (string)config('spectre.access_token');
+        app('log')->debug(sprintf('Going to download account #%d', $accountId));
+        $request = new GetAccountRequest($url, $token);
+        $request->setId($accountId);
+        /** @var GetAccountResponse $result */
+        $result = $request->get();
+        $type   = $result->getAccount()->type;
+
+        app('log')->debug(sprintf('Discovered that account #%d is of type "%s"', $accountId, $type));
+
+        return $type;
+    }
+
+    /**
      * @param string $source
      * @param string $destination
      *
-     * @throws ImportException
      * @return string
+     * @throws ImportException
      */
     private function getTransactionType(string $source, string $destination): string
     {
@@ -314,5 +310,14 @@ class GenerateTransactions
             case 'revenue-asset':
                 return 'deposit';
         }
+    }
+
+    /**
+     * @param Configuration $configuration
+     */
+    public function setConfiguration(Configuration $configuration): void
+    {
+        $this->configuration = $configuration;
+        $this->accounts      = $configuration->getAccounts();
     }
 }

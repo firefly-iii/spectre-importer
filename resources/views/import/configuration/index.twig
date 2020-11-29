@@ -54,7 +54,7 @@
                                                     {% for ff3Account in ff3Accounts %}
                                                         {% if ff3Account.iban == spectreAccount.iban %}
                                                             <br/><span class="text-success">This Spectre account will be imported into <a
-                                                                    href="{{ ff3Account.uri }}"
+                                                                    href="{{ ff3Account.url }}"
                                                                     title="{{ ff3Account.name }}">{{ ff3Account.name }}</a>.</span>
                                                             <input type="hidden" name="accounts[{{ spectreAccount.id }}]" value="{{ ff3Account.id }}"/>
                                                         {% endif %}

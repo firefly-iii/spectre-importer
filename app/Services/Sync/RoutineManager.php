@@ -41,8 +41,8 @@ class RoutineManager
     private string               $downloadIdentifier;
     private ParseSpectreDownload $spectreParser;
     private string               $syncIdentifier;
-    private GenerateTransactions $transactionGenerator;
     private FilterTransactions   $transactionFilter;
+    private GenerateTransactions $transactionGenerator;
     private SendTransactions     $transactionSender;
 
     /**
@@ -77,6 +77,20 @@ class RoutineManager
         $this->transactionGenerator->setIdentifier($this->syncIdentifier);
         $this->transactionFilter->setIdentifier($this->syncIdentifier);
         $this->transactionSender->setIdentifier($this->syncIdentifier);
+    }
+
+    private function generateSyncIdentifier(): void
+    {
+        app('log')->debug('Going to generate sync job identifier.');
+        $disk  = Storage::disk('jobs');
+        $count = 0;
+        do {
+            $syncIdentifier = Str::random(16);
+            $count++;
+            app('log')->debug(sprintf('Attempt #%d results in "%s"', $count, $syncIdentifier));
+        } while ($count < 30 && $disk->exists($syncIdentifier));
+        $this->syncIdentifier = $syncIdentifier;
+        app('log')->info(sprintf('Sync job identifier is "%s"', $syncIdentifier));
     }
 
     /**
@@ -172,19 +186,5 @@ class RoutineManager
         // send to Firefly III.
         app('log')->debug('Going to send them to Firefly III.');
         $sent = $this->transactionSender->send($filtered);
-    }
-
-    private function generateSyncIdentifier(): void
-    {
-        app('log')->debug('Going to generate sync job identifier.');
-        $disk  = Storage::disk('jobs');
-        $count = 0;
-        do {
-            $syncIdentifier = Str::random(16);
-            $count++;
-            app('log')->debug(sprintf('Attempt #%d results in "%s"', $count, $syncIdentifier));
-        } while ($count < 30 && $disk->exists($syncIdentifier));
-        $this->syncIdentifier = $syncIdentifier;
-        app('log')->info(sprintf('Sync job identifier is "%s"', $syncIdentifier));
     }
 }

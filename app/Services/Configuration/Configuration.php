@@ -54,23 +54,23 @@ class Configuration
 {
     /** @var int */
     public const VERSION = 1;
-    private bool    $addImportTag;
-    private bool    $ignoreDuplicateTransactions;
-    private array   $mapping;
-    private bool    $rules;
-    private bool    $skipForm;
-    private int     $version;
-    private ?string $dateNotAfter;
-    private ?string $dateNotBefore;
-    private ?int    $dateRangeNumber;
-    private ?string $dateRangeUnit;
-    private ?string $dateRange;
-    private array   $accounts;
+    private array      $accountTypes;
+    private array      $accounts;
+    private bool       $addImportTag;
     private string     $connection;
+    private ?string    $dateNotAfter;
+    private ?string    $dateNotBefore;
+    private ?string    $dateRange;
+    private ?int       $dateRangeNumber;
+    private ?string    $dateRangeUnit;
+    private bool       $doMapping;
     private string     $identifier;
-    private bool    $doMapping;
-    private array   $accountTypes;
-    private bool    $ignoreSpectreCategories;
+    private bool       $ignoreDuplicateTransactions;
+    private bool       $ignoreSpectreCategories;
+    private array      $mapping;
+    private bool       $rules;
+    private bool       $skipForm;
+    private int        $version;
 
     /**
      * Configuration constructor.
@@ -100,6 +100,19 @@ class Configuration
     }
 
     /**
+     * @param array $data
+     *
+     * @return $this
+     */
+    public static function fromFile(array $data): self
+    {
+        Log::debug('Now in Configuration::fromFile', $data);
+        $version = $data['version'] ?? 1;
+
+        return self::fromArray($data);
+    }
+
+    /**
      * @param array $array
      *
      * @return static
@@ -116,8 +129,8 @@ class Configuration
         $object->ignoreSpectreCategories     = $array['ignore_spectre_categories'] ?? false;
         $object->mapping                     = $array['mapping'] ?? ['accounts' => [], 'categories' => []];
         $object->doMapping                   = $array['do_mapping'] ?? false;
-        $object->identifier                  = (string) ($array['identifier'] ?? '0');
-        $object->connection                  = (string) ($array['connection'] ?? '0');
+        $object->identifier                  = (string)($array['identifier'] ?? '0');
+        $object->connection                  = (string)($array['connection'] ?? '0');
         $object->accounts                    = $array['accounts'] ?? [];
         $object->dateRange                   = $array['date_range'] ?? 'all';
         $object->dateRangeNumber             = $array['date_range_number'] ?? 30;
@@ -129,304 +142,6 @@ class Configuration
         $object->updateDateRange();
 
         return $object;
-    }
-
-    /**
-     * @return array
-     */
-    public function getAccountTypes(): array
-    {
-        return $this->accountTypes;
-    }
-
-    /**
-     * @return bool
-     */
-    public function emptyMapping(): bool
-    {
-        return $this->mapping === ['accounts' => [], 'categories' => []];
-    }
-
-    /**
-     * @return string
-     */
-    public function getDateRange(): string
-    {
-        return $this->dateRange;
-    }
-
-    /**
-     * @param array $data
-     *
-     * @return $this
-     */
-    public static function fromFile(array $data): self
-    {
-        Log::debug('Now in Configuration::fromFile', $data);
-        $version = $data['version'] ?? 1;
-
-        return self::fromArray($data);
-    }
-
-    /**
-     * @return bool
-     */
-    public function isDoMapping(): bool
-    {
-        return $this->doMapping;
-    }
-
-
-    /**
-     * @return array
-     */
-    public function getMapping(): array
-    {
-        return $this->mapping ?? [];
-    }
-
-    /**
-     * @param array $mapping
-     */
-    public function setMapping(array $mapping): void
-    {
-        $this->mapping = $mapping;
-    }
-
-    /**
-     * @return array
-     */
-    public function getRoles(): array
-    {
-        return $this->roles ?? [];
-    }
-
-    /**
-     * @return bool
-     */
-    public function isAddImportTag(): bool
-    {
-        return $this->addImportTag;
-    }
-
-
-    /**
-     * @return bool
-     */
-    public function isIgnoreDuplicateTransactions(): bool
-    {
-        return $this->ignoreDuplicateTransactions;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isRules(): bool
-    {
-        return $this->rules;
-    }
-
-
-    /**
-     * @return bool
-     */
-    public function isSkipForm(): bool
-    {
-        return $this->skipForm;
-    }
-
-    /**
-     * @return string
-     */
-    public function getDateNotAfter(): string
-    {
-        return $this->dateNotAfter;
-    }
-
-    /**
-     * @return string
-     */
-    public function getDateNotBefore(): string
-    {
-        return $this->dateNotBefore;
-    }
-
-    /**
-     * @return int
-     */
-    public function getDateRangeNumber(): int
-    {
-        return $this->dateRangeNumber;
-    }
-
-    /**
-     * @return string
-     */
-    public function getDateRangeUnit(): string
-    {
-        return $this->dateRangeUnit;
-    }
-
-
-    /**
-     * @param array $roles
-     */
-    public function setRoles(array $roles): void
-    {
-        $this->roles = $roles;
-    }
-
-    /**
-     * @param string $identifier
-     */
-    public function setIdentifier(string $identifier): void
-    {
-        $this->identifier = $identifier;
-    }
-
-    /**
-     * @return string
-     */
-    public function getIdentifier(): string
-    {
-        return $this->identifier;
-    }
-
-    /**
-     * @return string
-     */
-    public function getConnection(): string
-    {
-        return $this->connection;
-    }
-
-    /**
-     * @param string $connection
-     */
-    public function setConnection(string $connection): void
-    {
-        $this->connection = $connection;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isIgnoreSpectreCategories(): bool
-    {
-        return $this->ignoreSpectreCategories;
-    }
-
-    /**
-     * @param bool $ignoreSpectreCategories
-     */
-    public function setIgnoreSpectreCategories(bool $ignoreSpectreCategories): void
-    {
-        $this->ignoreSpectreCategories = $ignoreSpectreCategories;
-    }
-
-    /**
-     * @return array
-     */
-    public function getAccounts(): array
-    {
-        return $this->accounts;
-    }
-
-    /**
-     * @param bool $addImportTag
-     */
-    public function setAddImportTag(bool $addImportTag): void
-    {
-        $this->addImportTag = $addImportTag;
-    }
-
-    /**
-     * @param bool $ignoreDuplicateTransactions
-     */
-    public function setIgnoreDuplicateTransactions(bool $ignoreDuplicateTransactions): void
-    {
-        $this->ignoreDuplicateTransactions = $ignoreDuplicateTransactions;
-    }
-
-    /**
-     * @param bool $rules
-     */
-    public function setRules(bool $rules): void
-    {
-        $this->rules = $rules;
-    }
-
-    /**
-     * @param bool $skipForm
-     */
-    public function setSkipForm(bool $skipForm): void
-    {
-        $this->skipForm = $skipForm;
-    }
-
-    /**
-     * @param string $dateNotAfter
-     */
-    public function setDateNotAfter(string $dateNotAfter): void
-    {
-        $this->dateNotAfter = $dateNotAfter;
-    }
-
-    /**
-     * @param array $accountTypes
-     */
-    public function setAccountTypes(array $accountTypes): void
-    {
-        $this->accountTypes = $accountTypes;
-    }
-
-    /**
-     * @param string $dateNotBefore
-     */
-    public function setDateNotBefore(string $dateNotBefore): void
-    {
-        $this->dateNotBefore = $dateNotBefore;
-    }
-
-    /**
-     * @param int $dateRangeNumber
-     */
-    public function setDateRangeNumber(int $dateRangeNumber): void
-    {
-        $this->dateRangeNumber = $dateRangeNumber;
-    }
-
-    /**
-     * @param string $dateRangeUnit
-     */
-    public function setDateRangeUnit(string $dateRangeUnit): void
-    {
-        $this->dateRangeUnit = $dateRangeUnit;
-    }
-
-    /**
-     * @param string $dateRange
-     */
-    public function setDateRange(string $dateRange): void
-    {
-        $this->dateRange = $dateRange;
-    }
-
-    /**
-     * @param bool $doMapping
-     */
-    public function setDoMapping(bool $doMapping): void
-    {
-        $this->doMapping = $doMapping;
-    }
-
-    /**
-     * @param array $accounts
-     */
-    public function setAccounts(array $accounts): void
-    {
-        Log::debug('Configuration::setAccounts', $accounts);
-        $this->accounts = $accounts;
     }
 
     /**
@@ -471,7 +186,6 @@ class Configuration
         }
     }
 
-
     /**
      * @param string $unit
      * @param int    $number
@@ -499,6 +213,287 @@ class Configuration
     }
 
     /**
+     * @return bool
+     */
+    public function emptyMapping(): bool
+    {
+        return $this->mapping === ['accounts' => [], 'categories' => []];
+    }
+
+    /**
+     * @return array
+     */
+    public function getAccountTypes(): array
+    {
+        return $this->accountTypes;
+    }
+
+    /**
+     * @param array $accountTypes
+     */
+    public function setAccountTypes(array $accountTypes): void
+    {
+        $this->accountTypes = $accountTypes;
+    }
+
+    /**
+     * @return array
+     */
+    public function getAccounts(): array
+    {
+        return $this->accounts;
+    }
+
+    /**
+     * @param array $accounts
+     */
+    public function setAccounts(array $accounts): void
+    {
+        Log::debug('Configuration::setAccounts', $accounts);
+        $this->accounts = $accounts;
+    }
+
+    /**
+     * @return string
+     */
+    public function getConnection(): string
+    {
+        return $this->connection;
+    }
+
+    /**
+     * @param string $connection
+     */
+    public function setConnection(string $connection): void
+    {
+        $this->connection = $connection;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDateNotAfter(): string
+    {
+        return $this->dateNotAfter;
+    }
+
+    /**
+     * @param string $dateNotAfter
+     */
+    public function setDateNotAfter(string $dateNotAfter): void
+    {
+        $this->dateNotAfter = $dateNotAfter;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDateNotBefore(): string
+    {
+        return $this->dateNotBefore;
+    }
+
+    /**
+     * @param string $dateNotBefore
+     */
+    public function setDateNotBefore(string $dateNotBefore): void
+    {
+        $this->dateNotBefore = $dateNotBefore;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDateRange(): string
+    {
+        return $this->dateRange;
+    }
+
+    /**
+     * @param string $dateRange
+     */
+    public function setDateRange(string $dateRange): void
+    {
+        $this->dateRange = $dateRange;
+    }
+
+    /**
+     * @return int
+     */
+    public function getDateRangeNumber(): int
+    {
+        return $this->dateRangeNumber;
+    }
+
+    /**
+     * @param int $dateRangeNumber
+     */
+    public function setDateRangeNumber(int $dateRangeNumber): void
+    {
+        $this->dateRangeNumber = $dateRangeNumber;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDateRangeUnit(): string
+    {
+        return $this->dateRangeUnit;
+    }
+
+    /**
+     * @param string $dateRangeUnit
+     */
+    public function setDateRangeUnit(string $dateRangeUnit): void
+    {
+        $this->dateRangeUnit = $dateRangeUnit;
+    }
+
+    /**
+     * @return string
+     */
+    public function getIdentifier(): string
+    {
+        return $this->identifier;
+    }
+
+    /**
+     * @param string $identifier
+     */
+    public function setIdentifier(string $identifier): void
+    {
+        $this->identifier = $identifier;
+    }
+
+    /**
+     * @return array
+     */
+    public function getMapping(): array
+    {
+        return $this->mapping ?? [];
+    }
+
+    /**
+     * @param array $mapping
+     */
+    public function setMapping(array $mapping): void
+    {
+        $this->mapping = $mapping;
+    }
+
+    /**
+     * @return array
+     */
+    public function getRoles(): array
+    {
+        return $this->roles ?? [];
+    }
+
+    /**
+     * @return bool
+     */
+    public function isAddImportTag(): bool
+    {
+        return $this->addImportTag;
+    }
+
+    /**
+     * @param bool $addImportTag
+     */
+    public function setAddImportTag(bool $addImportTag): void
+    {
+        $this->addImportTag = $addImportTag;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isDoMapping(): bool
+    {
+        return $this->doMapping;
+    }
+
+    /**
+     * @param bool $doMapping
+     */
+    public function setDoMapping(bool $doMapping): void
+    {
+        $this->doMapping = $doMapping;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isIgnoreDuplicateTransactions(): bool
+    {
+        return $this->ignoreDuplicateTransactions;
+    }
+
+    /**
+     * @param bool $ignoreDuplicateTransactions
+     */
+    public function setIgnoreDuplicateTransactions(bool $ignoreDuplicateTransactions): void
+    {
+        $this->ignoreDuplicateTransactions = $ignoreDuplicateTransactions;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isIgnoreSpectreCategories(): bool
+    {
+        return $this->ignoreSpectreCategories;
+    }
+
+    /**
+     * @param bool $ignoreSpectreCategories
+     */
+    public function setIgnoreSpectreCategories(bool $ignoreSpectreCategories): void
+    {
+        $this->ignoreSpectreCategories = $ignoreSpectreCategories;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isRules(): bool
+    {
+        return $this->rules;
+    }
+
+    /**
+     * @param bool $rules
+     */
+    public function setRules(bool $rules): void
+    {
+        $this->rules = $rules;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isSkipForm(): bool
+    {
+        return $this->skipForm;
+    }
+
+    /**
+     * @param bool $skipForm
+     */
+    public function setSkipForm(bool $skipForm): void
+    {
+        $this->skipForm = $skipForm;
+    }
+
+    /**
+     * @param array $roles
+     */
+    public function setRoles(array $roles): void
+    {
+        $this->roles = $roles;
+    }
+
+    /**
      * @return array
      */
     public function toArray(): array
@@ -510,8 +505,8 @@ class Configuration
             'add_import_tag'                => $this->addImportTag,
             'do_mapping'                    => $this->doMapping,
             'mapping'                       => $this->mapping,
-            'identifier'                    => (string) $this->identifier,
-            'connection'                    => (string) $this->connection,
+            'identifier'                    => (string)$this->identifier,
+            'connection'                    => (string)$this->connection,
             'version'                       => $this->version,
             'accounts'                      => $this->accounts,
             'date_range'                    => $this->dateRange,

@@ -94,6 +94,126 @@ class MappingController extends Controller
     }
 
     /**
+     * @return array
+     * @throws FileNotFoundException
+     */
+    private function getOpposingAccounts(): array
+    {
+        $downloadIdentifier = session()->get(Constants::DOWNLOAD_JOB_IDENTIFIER);
+        $disk               = Storage::disk('downloads');
+        $json               = $disk->get($downloadIdentifier);
+        $array              = json_decode($json, true, 512, JSON_THROW_ON_ERROR);
+        $opposing           = [];
+
+        /** @var array $transaction */
+        foreach ($array as $accountId => $transactions) {
+            /** @var array $transaction */
+            foreach ($transactions as $transaction) {
+                $opposing[] = $transaction['extra']['payee'] ?? '';
+            }
+        }
+        $filtered = array_filter(
+            $opposing,
+            static function (string $value) {
+                return '' !== $value;
+            }
+        );
+
+        return array_unique($filtered);
+    }
+
+    /**
+     * @return array
+     * @throws JsonException
+     * @throws FileNotFoundException
+     */
+    private function getSpectreCategories(): array
+    {
+        $downloadIdentifier = session()->get(Constants::DOWNLOAD_JOB_IDENTIFIER);
+        $disk               = Storage::disk('downloads');
+        $json               = $disk->get($downloadIdentifier);
+        $array              = json_decode($json, true, 512, JSON_THROW_ON_ERROR);
+        $categories         = [];
+
+        /** @var array $transaction */
+        foreach ($array as $accountId => $transactions) {
+            /** @var array $transaction */
+            foreach ($transactions as $transaction) {
+                if (isset($transaction['category'])) {
+                    $categories[] = $transaction['category'];
+                }
+            }
+        }
+        $filtered = array_filter(
+            $categories,
+            static function (string $value) {
+                return '' !== $value;
+            }
+        );
+
+        return array_unique($categories);
+    }
+
+    /**
+     * @return array
+     * @throws ApiHttpException
+     */
+    private function getFireflyIIIAccounts(): array
+    {
+        $token   = (string)config('spectre.access_token');
+        $url     = (string)config('spectre.url');
+        $request = new GetAccountsRequest($url, $token);
+
+        $request->setVerify(config('spectre.connection.verify'));
+        $request->setTimeOut(config('spectre.connection.timeout'));
+
+        /** @var GetAccountsResponse $result */
+        $result = $request->get();
+        $return = [];
+        foreach ($result as $entry) {
+            $type = $entry->type;
+            if ('reconciliation' === $type || 'initial-balance' === $type) {
+                continue;
+            }
+            $id                 = (int)$entry->id;
+            $return[$type][$id] = $entry->name;
+            if ('' !== (string)$entry->iban) {
+                $return[$type][$id] = sprintf('%s (%s)', $entry->name, $entry->iban);
+            }
+        }
+        foreach ($return as $type => $entries) {
+            asort($return[$type]);
+        }
+
+        return $return;
+    }
+
+    /**
+     * @return array
+     * @throws ApiHttpException
+     */
+    private function getFireflyIIICategories(): array
+    {
+        $token   = (string)config('spectre.access_token');
+        $url     = (string)config('spectre.url');
+        $request = new GetCategoriesRequest($url, $token);
+
+        $request->setVerify(config('spectre.connection.verify'));
+        $request->setTimeOut(config('spectre.connection.timeout'));
+
+        /** @var GetCategoriesResponse $result */
+        $result = $request->get();
+        $return = [];
+        foreach ($result as $entry) {
+            $id          = (int)$entry->id;
+            $return[$id] = $entry->name;
+        }
+        asort($return);
+
+        return $return;
+    }
+
+    /**
      * @param Request $request
      *
      * @return RedirectResponse
@@ -130,125 +250,5 @@ class MappingController extends Controller
         session()->put(Constants::CONFIGURATION, $configuration->toArray());
 
         return redirect(route('import.sync.index'));
-    }
-
-    /**
-     * @throws ApiHttpException
-     * @return array
-     */
-    private function getFireflyIIIAccounts(): array
-    {
-        $token   = (string) config('spectre.access_token');
-        $uri     = (string) config('spectre.uri');
-        $request = new GetAccountsRequest($uri, $token);
-
-        $request->setVerify(config('spectre.connection.verify'));
-        $request->setTimeOut(config('spectre.connection.timeout'));
-
-        /** @var GetAccountsResponse $result */
-        $result = $request->get();
-        $return = [];
-        foreach ($result as $entry) {
-            $type = $entry->type;
-            if ('reconciliation' === $type || 'initial-balance' === $type) {
-                continue;
-            }
-            $id                 = (int) $entry->id;
-            $return[$type][$id] = $entry->name;
-            if ('' !== (string) $entry->iban) {
-                $return[$type][$id] = sprintf('%s (%s)', $entry->name, $entry->iban);
-            }
-        }
-        foreach ($return as $type => $entries) {
-            asort($return[$type]);
-        }
-
-        return $return;
-    }
-
-    /**
-     * @throws ApiHttpException
-     * @return array
-     */
-    private function getFireflyIIICategories(): array
-    {
-        $token   = (string) config('spectre.access_token');
-        $uri     = (string) config('spectre.uri');
-        $request = new GetCategoriesRequest($uri, $token);
-
-        $request->setVerify(config('spectre.connection.verify'));
-        $request->setTimeOut(config('spectre.connection.timeout'));
-
-        /** @var GetCategoriesResponse $result */
-        $result = $request->get();
-        $return = [];
-        foreach ($result as $entry) {
-            $id          = (int) $entry->id;
-            $return[$id] = $entry->name;
-        }
-        asort($return);
-
-        return $return;
-    }
-
-    /**
-     * @throws FileNotFoundException
-     * @throws JsonException
-     * @return array
-     */
-    private function getSpectreCategories(): array
-    {
-        $downloadIdentifier = session()->get(Constants::DOWNLOAD_JOB_IDENTIFIER);
-        $disk               = Storage::disk('downloads');
-        $json               = $disk->get($downloadIdentifier);
-        $array              = json_decode($json, true, 512, JSON_THROW_ON_ERROR);
-        $categories         = [];
-
-        /** @var array $transaction */
-        foreach ($array as $accountId => $transactions) {
-            /** @var array $transaction */
-            foreach ($transactions as $transaction) {
-                if (isset($transaction['category'])) {
-                    $categories[] = $transaction['category'];
-                }
-            }
-        }
-        $filtered = array_filter(
-            $categories,
-            static function (string $value) {
-                return '' !== $value;
-            }
-        );
-
-        return array_unique($categories);
-    }
-
-    /**
-     * @throws FileNotFoundException
-     * @return array
-     */
-    private function getOpposingAccounts(): array
-    {
-        $downloadIdentifier = session()->get(Constants::DOWNLOAD_JOB_IDENTIFIER);
-        $disk               = Storage::disk('downloads');
-        $json               = $disk->get($downloadIdentifier);
-        $array              = json_decode($json, true, 512, JSON_THROW_ON_ERROR);
-        $opposing           = [];
-
-        /** @var array $transaction */
-        foreach ($array as $accountId => $transactions) {
-            /** @var array $transaction */
-            foreach ($transactions as $transaction) {
-                $opposing[] = $transaction['extra']['payee'] ?? '';
-            }
-        }
-        $filtered = array_filter(
-            $opposing,
-            static function (string $value) {
-                return '' !== $value;
-            }
-        );
-
-        return array_unique($filtered);
     }
 }

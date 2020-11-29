@@ -24,11 +24,11 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use Artisan;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Routing\Controller as BaseController;
-use Artisan;
 
 /**
  * Class Controller
@@ -46,7 +46,7 @@ class Controller extends BaseController
 
         $variables = [
             'FIREFLY_III_ACCESS_TOKEN' => 'spectre.access_token',
-            'FIREFLY_III_URI'          => 'spectre.uri',
+            'FIREFLY_III_URL'          => 'spectre.url',
         ];
         foreach ($variables as $env => $config) {
 

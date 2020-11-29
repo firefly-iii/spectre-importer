@@ -36,7 +36,7 @@ class PostConnectSessionsRequest extends Request
     public string $customer;
 
     /** @var string */
-    public string $uri;
+    public string $url;
 
     /**
      * PostConnectSessionsRequest constructor.
@@ -50,22 +50,15 @@ class PostConnectSessionsRequest extends Request
         $this->setBase($url);
         $this->setAppId($appId);
         $this->setSecret($secret);
-        $this->setUri('connect_sessions/create');
+        $this->setUrl('connect_sessions/create');
     }
+
     /**
      * @inheritDoc
      */
     public function get(): Response
     {
         // TODO: Implement get() method.
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function put(): Response
-    {
-        // TODO: Implement put() method.
     }
 
     /**
@@ -84,7 +77,7 @@ class PostConnectSessionsRequest extends Request
                     'credentials_strategy'      => 'ask',
                 ],
                 'attempt'     => [
-                    'return_to' => $this->uri,
+                    'return_to' => $this->url,
                 ],
 
             ],
@@ -93,5 +86,13 @@ class PostConnectSessionsRequest extends Request
         $response = $this->sendUnsignedSpectrePost($body);
 
         return new PostConnectSessionResponse($response['data']);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function put(): Response
+    {
+        // TODO: Implement put() method.
     }
 }
