@@ -42,7 +42,7 @@
                         <div class="form-group row">
                             <label for="config_file" class="col-sm-4 col-form-label">Pre-made configuration file</label>
                             <div class="col-sm-8">
-                                <select class="form-control" name="existing_config">
+                                <select class="form-control" name="existing_config" id="existing_config">
                                     <option value="" label="Upload or manual config">Upload or manual config</option>
                                     {% for file in list %}
                                         <option value="{{ file }}" label="{{ file }}">{{ file }}</option>
@@ -67,4 +67,55 @@
             </div>
         </div>
     </div>
+{% endblock %}
+{% block scripts %}
+<script type="application/javascript">
+    $(function () {
+        "use strict";
+        if(readCookie('selected-json')) {
+            $('#existing_config').val(readCookie('selected-json'));
+        }
+        // catch the before submit and place a cookie.
+        $('#store').submit(function() {
+            var selected = $('#existing_config').val();
+            if('' !== selected) {
+                createCookie('selected-json', selected, 365);
+            }
+            return true;
+
+        });
+
+    });
+
+    // cookie methods
+    function createCookie(name, value, days) {
+        "use strict";
+        var expires;
+
+        if (days) {
+            var date = new Date();
+            date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+            expires = "; expires=" + date.toGMTString();
+        } else {
+            expires = "";
+        }
+        document.cookie = encodeURIComponent(name) + "=" + encodeURIComponent(value) + expires + "; path=/";
+    }
+
+    function readCookie(name) {
+        "use strict";
+        var nameEQ = encodeURIComponent(name) + "=";
+        var ca = document.cookie.split(';');
+        for (var i = 0; i < ca.length; i++) {
+            var c = ca[i];
+            while (c.charAt(0) === ' ') {
+                c = c.substring(1, c.length);
+            }
+            if (c.indexOf(nameEQ) === 0) {
+                return decodeURIComponent(c.substring(nameEQ.length, c.length));
+            }
+        }
+        return null;
+    }
+</script>
 {% endblock %}
