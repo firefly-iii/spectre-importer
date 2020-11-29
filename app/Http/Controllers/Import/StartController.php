@@ -29,6 +29,9 @@ use App\Http\Controllers\Controller;
 use App\Http\Middleware\UploadedFiles;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\View\View;
+use Log;
+use Storage;
+
 
 /**
  * Class StartController
@@ -53,7 +56,38 @@ class StartController extends Controller
         $mainTitle = 'Import routine';
         $subTitle  = 'Start page and instructions';
 
-        return view('import.start.index', compact('mainTitle', 'subTitle'));
+        // get existing configs.
+        $disk = Storage::disk('configurations');
+        Log::debug(
+            sprintf(
+                'Going to check directory for config files: %s',
+                config('filesystems.disks.configurations.root'),
+            )
+        );
+        $list = $this->filterList($disk->files());
+
+        Log::debug('List of files:', $list);
+
+        return view('import.start.index', compact('mainTitle', 'subTitle', 'list'));
+    }
+
+    /**
+     * @param array $array
+     *
+     * @return array
+     */
+    private function filterList(array $array): array
+    {
+        $return = [];
+        $skip   = ['.gitignore'];
+        /** @var string $file */
+        foreach ($array as $file) {
+            if (!in_array($file, $skip, true)) {
+                $return[] = $file;
+            }
+        }
+
+        return $return;
     }
 
 

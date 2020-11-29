@@ -27,6 +27,7 @@
             <div class="col-lg-12">
                 <form method="post" action="{{ route('import.upload') }}" accept-charset="UTF-8" id="store" enctype="multipart/form-data">
                     <input type="hidden" name="_token" value="{{ csrf_token() }}"/>
+
                     <div class="form-group row">
                         <label for="config_file" class="col-sm-4 col-form-label"><strong>Optional</strong> configuration file</label>
                         <div class="col-sm-8">
@@ -35,8 +36,21 @@
                                 <span class="text-danger">{{ errors.first('config_file') }}</span>
                             {% endif %}
                         </div>
-
                     </div>
+
+                    {% if list|length > 0 %}
+                        <div class="form-group row">
+                            <label for="config_file" class="col-sm-4 col-form-label">Pre-made configuration file</label>
+                            <div class="col-sm-8">
+                                <select class="form-control" name="existing_config">
+                                    <option value="" label="Upload or manual config">Upload or manual config</option>
+                                    {% for file in list %}
+                                        <option value="{{ file }}" label="{{ file }}">{{ file }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    {% endif %}
 
                     <div class="row">
                         <div class="col-lg-6">
