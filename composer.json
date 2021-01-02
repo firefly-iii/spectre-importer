@@ -72,7 +72,7 @@
         "issues": "https://github.com/firefly-iii/firefly-iii/issues",
         "forum": "https://reddit.com/r/FireflyIII",
         "source": "https://github.com/firefly-iii/csv-importer",
-        "docs": "https://firefly-iii.gitbook.io/firefly-iii-csv-importer/"
+        "docs": "https://docs.firefly-iii.org/other-data-importers/"
     },
     "funding": [
         {
