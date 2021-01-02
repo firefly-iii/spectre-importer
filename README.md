@@ -15,7 +15,7 @@
   <p align="center">
     A tool to import from Salt Edge / Spectre into Firefly III.
     <br />
-    <a href="https://firefly-iii.gitbook.io/firefly-iii-spectre-importer/"><strong>Explore the docs »</strong></a>
+    <a href="https://docs.firefly-iii.org/other-data-importers/"><strong>Explore the docs »</strong></a>
     <br />
     <br />
     <a href="https://demo.firefly-iii.org/">View Firefly III demo</a>
@@ -66,33 +66,33 @@ Anybody who uses Firefly III and wants to automatically import from their bank u
 
 You can use this tool in several ways.
 
-1. [Install it on your server using composer](https://firefly-iii.gitbook.io/firefly-iii-spectre-importer/installing-and-running/self_hosted).
-2. [Use the Docker-image](https://firefly-iii.gitbook.io/firefly-iii-spectre-importer/installing-and-running/docker).
+1. [Install it on your server using composer](https://docs.firefly-iii.org/other-data-importers/install/self_hosted/).
+2. [Use the Docker-image](https://docs.firefly-iii.org/other-data-importers/install/docker/).
 
-Generally speaking, it's easiest to use and install this tool the same way as you use Firefly III. And although it features an excellent web-interface, you can also use the command line to import your data. There are [upgrade instructions](https://firefly-iii.gitbook.io/firefly-iii-spectre-importer/upgrading/upgrade) for both methods of installation.
+Generally speaking, it's easiest to use and install this tool the same way as you use Firefly III. And although it features an excellent web-interface, you can also use the command line to import your data. There are [upgrade instructions](https://docs.firefly-iii.org/other-data-importers/upgrade/) for both methods of installation.
 
-The [full usage instructions](https://firefly-iii.gitbook.io/firefly-iii-spectre-importer/) can be found in the documentation. Basically, this is the workflow:
+The [full usage instructions](https://docs.firefly-iii.org/other-data-importers/) can be found in the documentation. Basically, this is the workflow:
 
 ### Using the web interface
 
-1. [Set up and configure your Personal Access Token and Firefly III URL](https://firefly-iii.gitbook.io/firefly-iii-spectre-importer/installing-and-running/configure).
-2. [Create a new connection to your bank or select an existing connection](https://firefly-iii.gitbook.io/firefly-iii-spectre-importer/importing-data/select_connection).
-3. [Configure the import parameters](https://firefly-iii.gitbook.io/firefly-iii-spectre-importer/importing-data/configure).
-4. [Map values in the spectre file to existing values in your database](https://firefly-iii.gitbook.io/firefly-iii-spectre-importer/importing-data/map).
+1. [Set up and configure your Personal Access Token and Firefly III URL](https://docs.firefly-iii.org/other-data-importers/install/configure/).
+2. [Create a new connection to your bank or select an existing connection](https://docs.firefly-iii.org/other-data-importers/usage/filter_import/).
+3. [Configure the import parameters](https://docs.firefly-iii.org/other-data-importers/usage/configure/).
+4. [Map values in the spectre file to existing values in your database](https://docs.firefly-iii.org/other-data-importers/usage/map/).
 5. [Enjoy the result in Firefly III](https://github.com/firefly-iii/firefly-iii).
 
 ### Using the auto-import
 
 1. Import at least once, so you'll have a configuration file.
-2. [Run the Docker inline import command](https://firefly-iii.gitbook.io/firefly-iii-spectre-importer/importing-data/command_line)
+2. [Run the Docker inline import command](https://docs.firefly-iii.org/other-data-importers/usage/command_line/)
 
 ## Known import challenges
 
 Most people run into the same problems when importing data into Firefly III. Read more about those on the following pages:
 
-1. [Issues with your Personal Access Token](https://firefly-iii.gitbook.io/firefly-iii-spectre-importer/errors-and-trouble-shooting/token_errors)
-2. [Often seen errors and issues](https://firefly-iii.gitbook.io/firefly-iii-spectre-importer/errors-and-trouble-shooting/freq_errors).
-3. [Frequently asked questions](https://firefly-iii.gitbook.io/firefly-iii-spectre-importer/errors-and-trouble-shooting/freq_questions).
+1. [Issues with your Personal Access Token](https://docs.firefly-iii.org/other-data-importers/errors/token_errors/)
+2. [Often seen errors and issues](https://docs.firefly-iii.org/other-data-importers/errors/freq_errors/).
+3. [Frequently asked questions](https://docs.firefly-iii.org/other-data-importers/errors/freq_questions/).
 
 ## Other stuff
 
