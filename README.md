@@ -5,9 +5,9 @@
 
 <!-- PROJECT LOGO -->
 <br />
+<br />
 <p align="center">
-  <a href="https://firefly-iii.org/">
-    <img src="https://www.firefly-iii.org/static/img/logo-small-new.png" alt="Logo" width="96" height="96">
+      <img src="https://fireflyiiiwebsite.z6.web.core.windows.net/assets/logo/small.png" alt="Firefly III" width="120" height="178">
   </a>
 </p>
   <h1 align="center">Firefly III Salt Edge / Spectre importer</h1>
